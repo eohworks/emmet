@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emmett — Home (Branch)</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="nav-scroll.js" defer></script>
+</head>
+<body class="plp-branch-body">
+
+<header class="site-header">
+  <a href="index.html" class="nav-link">Shop</a>
+  <span class="site-logo" role="img" aria-label="Emmett">
+    <span class="site-logo-svg" id="siteLogo"></span>
+    <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </span>
+  <a href="#" class="nav-link" id="cartLink">Cart</a>
+</header>
+
+<main class="plp-branch-hero">
+  <img class="plp-branch-hero-bg" src="assets/hero.jpg" alt="Five plush toy characters — the Emmett cast — standing side by side.">
+  <div class="plp-branch-carousel" id="plpCarousel"></div>
+</main>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head">
+    <span class="cart-title">Your Bag</span>
+    <button class="cart-close" id="cartClose" aria-label="Close">&times;</button>
+  </div>
+  <p class="cart-empty" id="cartEmpty">Your bag is empty.</p>
+  <div class="cart-items" id="cartItems" style="display:none"></div>
+  <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
+</aside>
+
+<script src="products.js"></script>
+<script src="cart.js"></script>
+<script>
+  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("siteLogo").innerHTML = svg;
+  });
+
+  // All 10 real products (every item x finish combination, same catalog as
+  // the main PLP grid) rather than the one-finish-per-item subset the
+  // original Figma frame showed. Item Three/Gold stays the default active
+  // slide, same as before, just now roughly centered among all 10.
+  const SLIDES = [
+    { item: "one", finish: "silver" },
+    { item: "one", finish: "gold" },
+    { item: "two", finish: "silver" },
+    { item: "two", finish: "gold" },
+    { item: "three", finish: "gold" },
+    { item: "three", finish: "silver" },
+    { item: "four", finish: "silver" },
+    { item: "four", finish: "gold" },
+    { item: "five", finish: "silver" },
+    { item: "five", finish: "gold" },
+  ];
+  let activeIndex = 4;
+
+  const carousel = document.getElementById("plpCarousel");
+
+  // Read from CSS (--carousel-spacing) rather than a hardcoded constant, so
+  // the mobile media query's smaller value takes effect automatically —
+  // including across an orientation change or window resize — without the
+  // spacing number having to be duplicated/kept in sync in JS.
+  function getSpacing() {
+    return parseFloat(getComputedStyle(carousel).getPropertyValue("--carousel-spacing")) || 340;
+  }
+
+  function slideTransform(offset) {
+    const spacing = getSpacing();
+    return {
+      x: offset * spacing,
+      scale: Math.max(0.35, 1 - Math.abs(offset) * 0.2),
+      z: 10 - Math.abs(offset),
+    };
+  }
+
+  // Moves every slide to its position for the current activeIndex. Slide
+  // elements are built once (see buildSlides) and never recreated, so
+  // changing these custom properties on the same DOM node is what lets the
+  // CSS transition on .plp-branch-slide actually animate the move — a full
+  // innerHTML rebuild per click would create fresh nodes with no "before"
+  // state to animate from, and just jump instantly instead.
+  function positionSlides() {
+    carousel.querySelectorAll(".plp-branch-slide").forEach((slideEl) => {
+      const i = Number(slideEl.dataset.index);
+      const { x, scale, z } = slideTransform(i - activeIndex);
+      slideEl.style.setProperty("--slide-x", `${x}px`);
+      slideEl.style.setProperty("--slide-scale", scale);
+      slideEl.style.setProperty("--slide-z", z);
+    });
+  }
+
+  function setActive(i) {
+    activeIndex = i;
+    carousel.querySelectorAll(".plp-branch-slide").forEach((slideEl) => {
+      slideEl.classList.toggle("is-active", Number(slideEl.dataset.index) === activeIndex);
+    });
+    positionSlides();
+  }
+
+  function buildSlides() {
+    carousel.innerHTML = SLIDES.map((slide, i) => {
+      const product = PRODUCTS[slide.item];
+      const finishLabel = slide.finish.charAt(0).toUpperCase() + slide.finish.slice(1);
+      return `
+        <div class="plp-branch-slide${i === activeIndex ? " is-active" : ""}" data-index="${i}">
+          <div class="card-media"><img src="${product.images[slide.finish]}" alt="${product.name}, ${finishLabel} finish" draggable="false"></div>
+          <div class="card-row card-row--top">
+            <p class="card-name">${product.name}</p>
+            <p class="card-finish">${finishLabel}</p>
+          </div>
+          <div class="card-row card-row--bottom">
+            <p class="card-price">$${product.price}</p>
+            <button type="button" class="btn-bag" data-add-to-bag>Add To Bag</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Non-active slide: click slides it smoothly into the center position.
+    // Already-active slide: click navigates to its PDP, same as a regular
+    // product card would.
+    carousel.querySelectorAll(".plp-branch-slide").forEach((slideEl) => {
+      const i = Number(slideEl.dataset.index);
+      slideEl.addEventListener("click", () => {
+        if (i === activeIndex) {
+          const slide = SLIDES[i];
+          location.href = `pdp.html?item=${slide.item}&finish=${slide.finish}`;
+        } else {
+          setActive(i);
+        }
+      });
+
+      const btn = slideEl.querySelector("[data-add-to-bag]");
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const slide = SLIDES[i];
+        const product = PRODUCTS[slide.item];
+        Cart.add({ name: product.name, finish: slide.finish, price: product.price, image: product.images[slide.finish] });
+        btn.textContent = "Added";
+        btn.classList.add("is-added");
+        setTimeout(() => {
+          btn.textContent = "Add To Bag";
+          btn.classList.remove("is-added");
+        }, 1200);
+      });
+    });
+
+    positionSlides();
+  }
+
+  buildSlides();
+
+  // Mobile: swipe left/right to move to the next/previous product, sliding
+  // smoothly into center via the same setActive() a click uses. This is a
+  // discrete "swipe = advance one" gesture (like the click interaction),
+  // not a 1:1 finger-follow drag — deliberately, to match how clicking
+  // already works here rather than reintroducing live drag-tracking.
+  let touchStartX = null;
+
+  carousel.addEventListener(
+    "touchstart",
+    (e) => {
+      touchStartX = e.touches[0].clientX;
+    },
+    { passive: true }
+  );
+
+  carousel.addEventListener(
+    "touchend",
+    (e) => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      const SWIPE_THRESHOLD = 40; // shorter swipes are left to register as a tap on whatever's underneath
+      if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+      if (dx < 0) {
+        setActive(Math.min(SLIDES.length - 1, activeIndex + 1));
+      } else {
+        setActive(Math.max(0, activeIndex - 1));
+      }
+    },
+    { passive: true }
+  );
+
+  // Re-run the transform math on resize/orientation-change so a live
+  // breakpoint change (e.g. --carousel-spacing switching at 768px) is
+  // reflected immediately instead of only on the next slide change.
+  window.addEventListener("resize", positionSlides);
+</script>
+</body>
+</html>

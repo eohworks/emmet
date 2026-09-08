@@ -1,0 +1,1016 @@
+/* Emmett — Home page. Desktop breakpoint only.
+   All visual values come from tokens.css (generated from tokens.json / Figma variables).
+   Do not hardcode colors, type, spacing, or radii here — reference a var(--token) instead. */
+
+@import url("tokens.css");
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+body {
+  background: var(--color-surface-page);
+  font-family: var(--font-family-text), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+/* ---------- Header (overlaid on hero, transparent) ---------- */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-200) var(--space-500);
+  min-height: 60px;
+}
+
+.nav-link {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--nav-font-size);
+  letter-spacing: var(--nav-tracking);
+  color: var(--nav-text-color);
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  line-height: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Logo stays fixed and always visible; only Shop/Cart hide on scroll-down
+   and reappear on scroll-up (toggled via nav-scroll.js). */
+.site-header.nav-links-hidden .nav-link {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+.site-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+  width: 190px;
+}
+
+.site-logo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1599 / 997;
+  background: var(--color-navy-900);
+  overflow: hidden;
+}
+
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Shop grid ---------- */
+
+.shop {
+  width: 100%;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+}
+
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 4 / 5;
+  background: var(--card-bg);
+  border: var(--card-border-width) solid var(--card-border-color);
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-left: calc(var(--card-border-width) * -1);
+  margin-top: calc(var(--card-border-width) * -1);
+}
+
+.product-card.span-2 {
+  grid-column: span 2;
+}
+
+/* Lifestyle variant — editorial/lifestyle photography instead of a plain
+   product pack shot. No border (the photo runs to the card edge); name/
+   finish/price/button stay hidden until hover, then revealed in the same
+   pink hover color as the pack-shot variant (.product-card:hover ... below
+   already covers this, since these cards keep the base .product-card class
+   too — no separate color rule needed here). */
+.product-card--lifestyle {
+  border: none;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.product-card--lifestyle .card-row {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.product-card--lifestyle:hover .card-row {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.card-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--card-padding-x);
+}
+
+.card-row--top {
+  padding-top: var(--space-150);
+  height: 24px;
+}
+
+.card-row--bottom {
+  padding-bottom: var(--space-200);
+  height: 34px;
+}
+
+.card-name,
+.card-finish,
+.card-price {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--price-font-size);
+  letter-spacing: var(--font-tracking-product);
+  color: var(--card-text-color);
+  white-space: nowrap;
+  margin: 0;
+}
+
+.btn-bag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  background: var(--button-bg-default);
+  color: var(--button-text-default);
+  border-radius: var(--button-radius);
+  font-family: var(--button-font-family), sans-serif;
+  font-size: var(--button-font-size);
+  letter-spacing: var(--font-tracking-product);
+  white-space: nowrap;
+  border: none;
+}
+
+.btn-bag:hover {
+  background: var(--button-bg-hover);
+}
+
+/* Large size — PDP. Checked against the real button (Figma node 11:1362/
+   11:1366): font-size and horizontal padding scale up, but vertical padding
+   and tracking do not — it reuses the compact button-padding-y and the nav
+   type scale's tracking, not a "large" version of the compact ones. */
+.btn-bag--large {
+  height: auto;
+  padding: var(--button-padding-y) var(--button-padding-x-large);
+  font-size: var(--button-font-size-large);
+  letter-spacing: var(--button-tracking-large);
+}
+
+/* Product Card hover — all card text (name, finish, price) shares one
+   component-tier color token, card.text-color(-hover), rather than price
+   having its own separate token for a color it never actually diverges on. */
+.product-card:hover .card-name,
+.product-card:hover .card-finish,
+.product-card:hover .card-price {
+  color: var(--card-text-color-hover);
+}
+
+/* ---------- Ticker (promo marquee) ---------- */
+
+.ticker {
+  position: relative;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 42px;
+  background: var(--ticker-bg);
+  border-radius: var(--ticker-radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-500);
+  white-space: nowrap;
+  animation: ticker-scroll 22s linear infinite;
+  padding-left: var(--space-500);
+}
+
+.ticker-track span {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--nav-font-size);
+  letter-spacing: var(--nav-tracking);
+  color: var(--ticker-text-color);
+  text-transform: uppercase;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  width: 100%;
+  background: var(--footer-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-mark {
+  position: relative;
+  width: 100px;
+  height: 99px;
+  margin: var(--space-600) 0 var(--space-300);
+}
+
+.footer-mark-svg,
+.footer-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Liquid metal ambient shimmer ----------
+   A rotating highlight gradient masked to the exact glyph/symbol shape, so the
+   silhouette stays put and only the "light" moves inside it — reads as a moving
+   reflection across liquid metal rather than a shape sliding around. */
+
+.liquid-metal {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.liquid-metal--logo {
+  -webkit-mask-image: url("assets/svg/logo-mask.svg");
+  mask-image: url("assets/svg/logo-mask.svg");
+}
+
+.liquid-metal--symbol {
+  -webkit-mask-image: url("assets/svg/symbol-mask.svg");
+  mask-image: url("assets/svg/symbol-mask.svg");
+}
+
+.liquid-metal--logo,
+.liquid-metal--symbol {
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.liquid-metal-spin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 340%;
+  height: 340%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: center;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(0, 0, 0, 0.3) 0deg,
+    transparent 9deg,
+    rgba(255, 255, 255, 1) 18deg,
+    transparent 27deg,
+    rgba(0, 0, 0, 0.18) 36deg,
+    transparent 45deg
+  );
+  animation: liquid-metal-spin 9s linear infinite;
+  will-change: transform;
+}
+
+.liquid-metal--symbol .liquid-metal-spin {
+  animation-duration: 7s;
+  animation-direction: reverse;
+}
+
+@keyframes liquid-metal-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-metal-spin {
+    animation: none;
+  }
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--footer-gap);
+  padding-bottom: var(--space-800);
+}
+
+.footer-link {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--footer-link-font-size);
+  letter-spacing: var(--font-tracking-footer-link);
+  color: var(--footer-link-color);
+  text-transform: uppercase;
+  background: none;
+  border: none;
+}
+
+/* ==========================================================================
+   PDP — desktop only. The header is the same transparent overlay used on
+   Home (only one nav variant, site-wide). The gallery is normal document
+   flow — its two stacked images are what give the page real height, and the
+   actual page scrolls to reveal them (no isolated inner-scroll container).
+   The details column is pinned to the viewport (position: fixed) instead,
+   so it stays in place the whole time regardless of how far the page has
+   scrolled.
+   ========================================================================== */
+
+.pdp {
+  display: flex;
+}
+
+.pdp-gallery {
+  width: 50%;
+  background: var(--color-navy-900);
+}
+
+.pdp-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Carousel dot indicators — only relevant/shown on mobile (see media query).
+   Hidden on desktop, where the gallery is a vertical stacked scroll, not a
+   swipeable carousel. */
+.pdp-gallery-dots {
+  display: none;
+}
+
+.pdp-gallery-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-navy-900-a50);
+}
+
+.pdp-gallery-dots span.is-active {
+  background: var(--color-accent-brand);
+}
+
+.pdp-details {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100vh;
+  overflow-y: auto; /* safety net if content ever exceeds viewport height, not the primary scroll mechanism */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* per the real Figma PDP: the info block sits exactly vertically centered in the panel (measured 471.9px top offset in a 1141px-tall panel — precisely (1141-197)/2), not top-pinned */
+  padding: 0 96px; /* 96px matches the real Figma inset (measured, not derived from the space scale) */
+}
+
+.pdp-top-row {
+  display: flex;
+  align-items: center; /* was baseline — misaligned against the color picker's pill, whose box height varies by selection state, not by a shared text baseline */
+  justify-content: space-between;
+  gap: var(--space-300);
+  margin-bottom: var(--space-300);
+}
+
+.pdp-name {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--font-size-product); /* was a hardcoded 20px guess made before the real PDP existed in Figma — the actual node is bound to font/size/200 (14px), same size as price/card text, not font/size/500 (28px, nav's size) */
+  letter-spacing: var(--font-tracking-product);
+  color: var(--card-text-color);
+  margin: 0;
+}
+
+/* Color Picker — redesigned in Figma (node 23:9, not yet ported back to a
+   real Figma component). Both swatches sit bare side by side; the selected
+   one gets a circular ring (reusing Button's own border/radius/padding
+   tokens), and a single label to the right names the current finish. */
+
+.color-picker-swatches {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.color-picker-swatch-wrap {
+  display: inline-flex;
+  padding: var(--space-050); /* gap between the swatch circle and its selection ring — tightened from --button-padding-x per explicit request */
+  border-radius: var(--radius-pill);
+  border: var(--border-width-thin) solid transparent;
+  background: none;
+  cursor: pointer;
+}
+
+.color-picker-swatch-wrap.is-selected {
+  border-color: var(--color-border-subtle);
+}
+
+.color-picker-swatch {
+  display: block;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden; /* clips the .liquid-metal shimmer to this circle — no mask-image needed like the logo/symbol, since the shape here is just a circle */
+}
+
+.color-picker-swatch[data-finish="gold"] {
+  background: var(--picker-swatch-fill-gold);
+}
+
+.color-picker-swatch[data-finish="silver"] {
+  background: var(--picker-swatch-fill-silver);
+}
+
+.color-picker-label {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--price-font-size);
+  letter-spacing: var(--font-tracking-product);
+  color: var(--card-text-color);
+  white-space: nowrap;
+}
+
+.pdp-description {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--card-text-color);
+  opacity: 0.85;
+  margin: 0 0 var(--space-500);
+}
+
+.pdp-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* price left, button right — matches the product card's bottom row (Figma node 11:1358 confirms the real PDP uses the same pattern) */
+  gap: var(--space-300);
+}
+
+.pdp-price {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--font-size-product); /* was a hardcoded 16px guess — the real node (11:1360) is bound to font/size/200 (14px), same as the product name */
+  letter-spacing: var(--font-tracking-product);
+  color: var(--card-text-color);
+  margin: 0;
+}
+
+.pdp-sku {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: 12px;
+  color: var(--card-text-color);
+  opacity: 0.45;
+  margin-top: var(--space-600);
+}
+
+/* ==========================================================================
+   PDP Branch — experimental variant (Figma node 37:10, "PDP branch"). One
+   continuous full-width image column (single page scroll, no split gallery/
+   details columns); the product info card floats on top of it as a sticky
+   "liquid glass" panel. That glass treatment is a deliberate departure from
+   the literal Figma frame (node 37:17 there just uses the plain opaque
+   card/bg fill) per explicit instruction — so the blur/opacity/radius/shadow
+   values below are new, bespoke to this variant, and intentionally NOT
+   ported into tokens.json, since there's no real Figma variable behind
+   "glass" to mirror. Everything inside the card (name, description, price,
+   button, color picker) reuses the exact same classes/tokens as the main
+   PDP — only the card's own container styling changes.
+   ========================================================================== */
+
+/* Positioning context for the sticky card overlay below — spans the hero
+   image AND the additional-images row combined, so the card keeps sticking
+   through both sections and only releases once the footer (its next
+   sibling, outside this wrapper) begins. */
+.pdp-branch-scroll {
+  position: relative;
+}
+
+/* 12-column underlying grid — the product (pack-shot) image is centered
+   in a 6-column span (columns 4–9) instead of running full-bleed; the
+   lifestyle image below it stays full-width (spans all 12). */
+.pdp-branch-gallery {
+  background: var(--color-navy-900);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.pdp-branch-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  grid-column: 1 / -1;
+}
+
+#pdpBranchMainImage {
+  grid-column: 4 / 10; /* columns 4–9 inclusive: 6 of 12, centered */
+}
+
+/* Absolutely-positioned overlay sized via inset:0 against .pdp-branch-scroll
+   (hero image + additional-images row combined) — this is what gives the
+   sticky card below room to travel through both sections and only release
+   right at the footer, instead of sticking forever like position:fixed
+   would. Same 12-col grid as the gallery so the card can share the image's
+   exact column span. */
+.pdp-branch-card-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: end; /* anchors the card's resting position to the bottom of the (tall) wrap, matching its bottom-sticky behavior — grid's default stretch would otherwise make it fill the wrap's full (image-column-height) row axis instead of sizing to its own content */
+  pointer-events: none; /* only the card itself should intercept clicks */
+}
+
+.pdp-branch-card {
+  grid-column: 4 / 10; /* centered on the product image's own 6-of-12 span */
+  position: sticky;
+  bottom: var(--space-500);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-inline-gap); /* semantic token for spacing between stacked items — not the raw --space-500 primitive, even though same value */
+  padding: var(--space-500);
+  pointer-events: auto;
+
+  /* Liquid glass — frosted, translucent panel over the scrolling imagery. */
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(30, 23, 82, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* The card's own top-row/description/bottom-row all reuse .pdp-top-row,
+   .pdp-description, .pdp-bottom-row etc. as-is, but those shared classes
+   carry their own margins from the main (non-gap-based) PDP layout — here
+   the card relies on flex `gap` for spacing instead, so those margins are
+   zeroed to avoid stacking on top of it. (No SKU line in this variant —
+   dropped to save space in the now-narrower, centered card.) */
+.pdp-branch-card .pdp-top-row {
+  margin-bottom: 0;
+}
+
+/* Pulls description up closer to the name/color-picker row specifically —
+   the card's `gap` (--space-inline-gap, 24px) still governs the other
+   transition (description → price/button row) unchanged; this just trims
+   the one above it down to --space-150 (10px) via a token-driven offset,
+   rather than reducing the shared gap value itself. */
+.pdp-branch-card .pdp-description {
+  margin: calc(var(--space-150) - var(--space-inline-gap)) 0 0;
+}
+
+/* Additional product images — a plain 6/6 two-up row below the sticky
+   hero, matching Figma's "Additional product images" section (node
+   51:322): two images sharing the same 12-col grid, each spanning half. */
+.pdp-branch-more-images {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  background: var(--color-navy-900);
+}
+
+.pdp-branch-more-images img {
+  display: block;
+  grid-column: span 6;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   Home/PLP Branch — experimental variant (Figma node 50:67, "Home/PLP
+   branch"). A single full-viewport, non-scrolling hero: the cast photo
+   fills the whole screen at 75% opacity, and all 5 products sit on top as
+   a coverflow-style carousel instead of a scrolling grid. Cards have no
+   background/border here (they float directly on the photo) and only the
+   centered ("active") product shows its name/finish/price/button — the
+   others are bare pendant images. Clicking a side pendant re-centers it;
+   clicking the already-centered one navigates to its PDP, same as a
+   regular product card would.
+   ========================================================================== */
+
+.plp-branch-body {
+  overflow: hidden; /* one full-viewport screen, no page scroll */
+}
+
+.plp-branch-hero {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-black);
+}
+
+.plp-branch-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.75;
+}
+
+.plp-branch-carousel {
+  position: absolute;
+  inset: 0;
+  --carousel-spacing: 340px; /* read by index-branch.html's JS so slide spacing stays in sync with the width below across breakpoints */
+  touch-action: pan-y; /* horizontal swipes are handled by our own JS below, not the browser's native gesture */
+}
+
+.plp-branch-slide {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 400px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* pins .card-row--top/--bottom to opposite edges, same as .product-card does */
+  transform: translate(-50%, -50%) translateX(var(--slide-x, 0px)) scale(var(--slide-scale, 1));
+  z-index: var(--slide-z, 1);
+  opacity: 0.9; /* non-selected products recede slightly */
+  transition: transform 0.4s ease, opacity 0.3s ease;
+}
+
+/* Hovering a dimmed product previews what clicking it would do — bring it
+   to full opacity — so the interaction reads clearly before you commit. */
+.plp-branch-slide:hover,
+.plp-branch-slide.is-active {
+  opacity: 1;
+}
+
+.plp-branch-slide .card-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* No background/border (unlike .product-card) — the image sits straight
+   on the hero photo. Name/finish/price/button reuse the exact same
+   .card-row/.card-name/.card-finish/.card-price/.btn-bag classes as the
+   regular grid cards; only the text color changes (white, since there's
+   no card-bg tinting it anymore) and visibility is gated to .is-active. */
+.plp-branch-slide .card-row {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.plp-branch-slide.is-active .card-row {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.plp-branch-slide .card-name,
+.plp-branch-slide .card-finish,
+.plp-branch-slide .card-price {
+  color: var(--button-text-default);
+}
+
+/* ---------- Cart drawer (shared by Home and PDP) ---------- */
+
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 40;
+}
+
+.cart-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(380px, 90vw);
+  background: var(--color-surface-page);
+  z-index: 50;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-600) var(--space-500);
+}
+
+.cart-drawer.is-open {
+  transform: translateX(0);
+}
+
+.cart-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-500);
+}
+
+.cart-title {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: 18px;
+  color: var(--card-text-color);
+  text-transform: uppercase;
+}
+
+.cart-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--card-text-color);
+  line-height: 1;
+}
+
+.cart-empty {
+  font-family: var(--font-family-text), sans-serif;
+  color: var(--card-text-color);
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-300);
+  overflow-y: auto;
+}
+
+.cart-item {
+  display: flex;
+  gap: var(--space-200);
+  align-items: center;
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+  padding-bottom: var(--space-300);
+}
+
+.cart-item img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+}
+
+.cart-item-name {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: 13px;
+  color: var(--card-text-color);
+}
+
+.cart-item-meta {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: 12px;
+  color: var(--card-text-color);
+  opacity: 0.6;
+}
+
+.cart-note {
+  margin-top: auto;
+  font-family: var(--font-family-text), sans-serif;
+  font-size: 11px;
+  color: var(--card-text-color);
+  opacity: 0.45;
+  padding-top: var(--space-300);
+}
+
+.btn-bag.is-added {
+  background: var(--color-accent-brand);
+}
+
+/* ==========================================================================
+   Responsive — Home page only. PDP stays desktop-only (fixed/scroll split
+   layout needs its own mobile treatment, not implied by this breakpoint).
+
+   Breakpoint: 768px — the standard mobile/tablet split. Below it, the grid
+   goes from 4 columns to 2: regular cards (1-span) go from 4-per-row to
+   2-per-row, and spread cards (2-span) go from half-width to full-width
+   (2 of 2 columns), i.e. 2-column spreads collapse to 1 column. Both
+   requirements fall out of the same single rule — no separate override
+   needed for .span-2.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .hero {
+    height: 100vh;
+    aspect-ratio: auto;
+  }
+
+  /* Image is sized by height only (width follows its natural ratio), so it
+     renders wider than the viewport — that overflow is what .hero clips, and
+     what the pan animates across. max-width:none overrides the global
+     img{max-width:100%} reset, which would otherwise cap it at 100vw and kill
+     the overflow entirely. */
+  .hero img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    max-width: none;
+    height: 100%;
+    object-fit: unset;
+    animation: hero-pan 24s ease-in-out infinite alternate;
+  }
+
+  /* translateX in % resolves against the image's own rendered width, so this
+     end position — self-width shifted left, then compensated by the viewport
+     width — always lands exactly on the image's right edge regardless of the
+     photo's actual aspect ratio (no hardcoded ratio constant to keep in sync
+     with whichever file ends up at assets/hero.jpg). */
+  @keyframes hero-pan {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% + 100vw)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero img {
+      animation: none;
+    }
+  }
+
+  .site-header {
+    padding: var(--space-150) var(--space-300);
+  }
+
+  .nav-link {
+    font-size: 18px;
+  }
+
+  .site-logo {
+    width: 120px;
+  }
+
+  /* ---- PDP: carousel image on top, info stacked below, footer visible ---- */
+
+  .pdp-shell {
+    height: auto;
+  }
+
+  .pdp {
+    flex-direction: column;
+  }
+
+  .pdp-gallery {
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pdp-gallery img {
+    flex: 0 0 100%;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    scroll-snap-align: start;
+  }
+
+  .pdp-gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-150);
+    padding: var(--space-300) 0;
+  }
+
+  .pdp-details {
+    position: static; /* reset the desktop rule's fixed-to-viewport positioning — mobile needs this back in normal flow, stacked below the gallery */
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    padding: var(--space-500);
+  }
+
+  /* PDP Branch: same sticky-to-bottom glass overlay as desktop (still
+     absolute + grid + position:sticky from the base rules above) — only
+     the column span changes, going full-width with a little horizontal
+     breathing room instead of the desktop's 6-of-12 centered column. */
+  .pdp-branch-card-wrap {
+    padding: 0 var(--space-300);
+  }
+
+  .pdp-branch-card {
+    grid-column: 1 / -1;
+  }
+
+  /* The 6-of-12 centered column is a desktop refinement — on narrow
+     screens the product image goes back to full width like the lifestyle
+     image below it. */
+  #pdpBranchMainImage {
+    grid-column: 1 / -1;
+  }
+
+  .pdp-branch-more-images img {
+    grid-column: 1 / -1;
+  }
+
+  /* PLP Branch carousel: smaller slides/spacing so more than one neighbor
+     is still visible on a phone-width screen. index-branch.html's JS reads
+     --carousel-spacing back out of this element, so the two stay in sync
+     without duplicating the number in JS. */
+  .plp-branch-carousel {
+    --carousel-spacing: 170px;
+  }
+
+  .plp-branch-slide {
+    width: 220px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card-row--top,
+  .card-row--bottom {
+    padding-left: var(--space-150);
+    padding-right: var(--space-150);
+  }
+
+  .card-name,
+  .card-finish,
+  .card-price {
+    font-size: 12px;
+  }
+
+  .btn-bag {
+    padding: var(--space-050) var(--space-150);
+    font-size: 12px;
+  }
+
+  .ticker-track span {
+    font-size: 18px;
+  }
+
+  .footer-links {
+    gap: var(--space-300);
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-left: var(--space-500);
+    padding-right: var(--space-500);
+  }
+}

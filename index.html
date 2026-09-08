@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emmett</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="nav-scroll.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="nav-link">Shop</a>
+  <span class="site-logo" role="img" aria-label="Emmett">
+    <span class="site-logo-svg" id="siteLogo"></span>
+    <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </span>
+  <a href="#" class="nav-link" id="cartLink">Cart</a>
+</header>
+
+<section class="hero">
+  <img src="assets/hero.jpg" alt="Five plush toy characters — the Emmett cast — standing side by side.">
+</section>
+
+<main class="shop">
+  <div class="product-grid" id="productGrid"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-mark" aria-hidden="true">
+    <span class="footer-mark-svg" id="footerMark"></span>
+    <span class="liquid-metal liquid-metal--symbol" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">About</a>
+    <a href="#" class="footer-link">Legal</a>
+    <a href="#" class="footer-link">Social</a>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head">
+    <span class="cart-title">Your Bag</span>
+    <button class="cart-close" id="cartClose" aria-label="Close">&times;</button>
+  </div>
+  <p class="cart-empty" id="cartEmpty">Your bag is empty.</p>
+  <div class="cart-items" id="cartItems" style="display:none"></div>
+  <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
+</aside>
+
+<script src="products.js"></script>
+<script src="cart.js"></script>
+<script>
+  // Exact 12-slot structure sourced from the Figma file (2 spread + 4 grid + ticker + 4 grid + 2 spread).
+  const SECTIONS = [
+    {
+      type: "spread",
+      cards: [
+        { name: "Item Five", finish: "Silver", image: "assets/item-five-silver.png" },
+        { name: "Item one", finish: "Silver", image: "assets/lifestyle-necklace.jpg", lifestyle: true },
+      ],
+    },
+    {
+      type: "grid",
+      cards: [
+        { name: "Item Two", finish: "Silver", image: "assets/item-two-silver.png" },
+        { name: "Item Two", finish: "Gold", image: "assets/item-two-gold.png" },
+        { name: "Item Three", finish: "Silver", image: "assets/item-three-silver.png" },
+        { name: "Item Three", finish: "Gold", image: "assets/item-three-gold.png" },
+      ],
+    },
+    { type: "ticker" },
+    {
+      type: "grid",
+      cards: [
+        { name: "Item Four", finish: "§", image: "assets/item-four-silver.png" },
+        { name: "Item Four", finish: "Gold", image: "assets/item-four-gold.png" },
+        { name: "Item One", finish: "Silver", image: "assets/item-one-silver.png" },
+        { name: "Item One", finish: "Gold", image: "assets/item-one-gold.png" },
+      ],
+    },
+    {
+      type: "spread",
+      cards: [
+        { name: "Item one", finish: "Silver", image: "assets/character-art.jpg", lifestyle: true },
+        { name: "Item Five", finish: "Gold", image: "assets/item-five-gold.png" },
+      ],
+    },
+  ];
+
+  function cardHTML(card, isSpread) {
+    const item = card.name.replace(/^Item /i, "").toLowerCase();
+    const finish = card.finish.toLowerCase() === "gold" ? "gold" : "silver";
+    const href = `pdp.html?item=${item}&finish=${finish}`;
+    const classes = ["product-card", isSpread && "span-2", card.lifestyle && "product-card--lifestyle"]
+      .filter(Boolean)
+      .join(" ");
+    return `
+      <a href="${href}" class="${classes}">
+        <div class="card-media"><img src="${card.image}" alt="${card.name}, ${card.finish} finish"></div>
+        <div class="card-row card-row--top">
+          <p class="card-name">${card.name}</p>
+          <p class="card-finish">${card.finish}</p>
+        </div>
+        <div class="card-row card-row--bottom">
+          <p class="card-price">$675</p>
+          <button type="button" class="btn-bag">Add To Bag</button>
+        </div>
+      </a>
+    `;
+  }
+
+  function tickerHTML() {
+    const phrase = "Free shipping on orders above $100";
+    const repeats = Array(10).fill(`<span>${phrase}</span>`).join("");
+    return `
+      <div class="ticker">
+        <div class="ticker-track">${repeats}${repeats}</div>
+      </div>
+    `;
+  }
+
+  // Inline the real brand SVGs so their internal fill (a CSS var referencing the
+  // design tokens) resolves against this document's :root — an <img src="*.svg">
+  // would render as an opaque image and couldn't see our custom properties.
+  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("siteLogo").innerHTML = svg;
+  });
+  fetch("assets/svg/symbol.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("footerMark").innerHTML = svg;
+  });
+
+  const grid = document.getElementById("productGrid");
+  grid.innerHTML = SECTIONS.map((section) => {
+    if (section.type === "ticker") return tickerHTML();
+    const isSpread = section.type === "spread";
+    return section.cards.map((c) => cardHTML(c, isSpread)).join("");
+  }).join("");
+
+  const allCards = SECTIONS.filter((s) => s.type !== "ticker").flatMap((s) => s.cards);
+  grid.querySelectorAll(".product-card").forEach((cardEl, i) => {
+    const card = allCards[i];
+    const btn = cardEl.querySelector(".btn-bag");
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      Cart.add({ name: card.name, finish: card.finish, price: 675, image: card.image });
+      btn.textContent = "Added";
+      btn.classList.add("is-added");
+      setTimeout(() => {
+        btn.textContent = "Add To Bag";
+        btn.classList.remove("is-added");
+      }, 1200);
+    });
+  });
+</script>
+</body>
+</html>

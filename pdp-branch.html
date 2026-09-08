@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emmett — Product (Branch)</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="nav-scroll.js" defer></script>
+</head>
+<body class="pdp-body">
+
+<div class="pdp-shell">
+  <header class="site-header">
+    <a href="index.html" class="nav-link">Shop</a>
+    <span class="site-logo" role="img" aria-label="Emmett">
+      <span class="site-logo-svg" id="siteLogo"></span>
+      <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+    </span>
+    <a href="#" class="nav-link" id="cartLink">Cart</a>
+  </header>
+
+  <main class="pdp-branch">
+    <div class="pdp-branch-scroll">
+      <div class="pdp-branch-gallery" id="pdpBranchGallery">
+        <img id="pdpBranchMainImage" src="" alt="">
+      </div>
+
+      <div class="pdp-branch-more-images">
+        <img src="assets/lifestyle-necklace.jpg" alt="Emmett necklace, lifestyle photo">
+        <img src="assets/character-art.jpg" alt="Emmett necklace, lifestyle photo">
+      </div>
+
+      <div class="pdp-branch-card-wrap">
+        <div class="pdp-branch-card">
+          <div class="pdp-top-row">
+            <h1 class="pdp-name" id="pdpBranchName">Item One</h1>
+            <emmet-color-picker id="branchColorPicker" options="gold,silver" value="silver"></emmet-color-picker>
+          </div>
+
+          <p class="pdp-description" id="pdpBranchDescription"></p>
+          <div class="pdp-bottom-row">
+            <p class="pdp-price" id="pdpBranchPrice"></p>
+            <button type="button" class="btn-bag btn-bag--large" id="pdpBranchAddBtn">Add To Bag</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-mark" aria-hidden="true">
+    <span class="footer-mark-svg" id="footerMark"></span>
+    <span class="liquid-metal liquid-metal--symbol" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">About</a>
+    <a href="#" class="footer-link">Legal</a>
+    <a href="#" class="footer-link">Social</a>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head">
+    <span class="cart-title">Your Bag</span>
+    <button class="cart-close" id="cartClose" aria-label="Close">&times;</button>
+  </div>
+  <p class="cart-empty" id="cartEmpty">Your bag is empty.</p>
+  <div class="cart-items" id="cartItems" style="display:none"></div>
+  <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
+</aside>
+
+<script src="products.js"></script>
+<script src="cart.js"></script>
+<script src="components.js"></script>
+<script>
+  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("siteLogo").innerHTML = svg;
+  });
+  fetch("assets/svg/symbol.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("footerMark").innerHTML = svg;
+  });
+
+  const params = new URLSearchParams(location.search);
+  const itemKey = PRODUCTS[params.get("item")] ? params.get("item") : "one";
+  let finish = ["silver", "gold"].includes(params.get("finish")) ? params.get("finish") : "silver";
+
+  const product = PRODUCTS[itemKey];
+
+  const nameEl = document.getElementById("pdpBranchName");
+  const descEl = document.getElementById("pdpBranchDescription");
+  const priceEl = document.getElementById("pdpBranchPrice");
+  const colorPicker = document.getElementById("branchColorPicker");
+  const mainImage = document.getElementById("pdpBranchMainImage");
+
+  function renderProduct() {
+    nameEl.textContent = `${product.name} (${product.sku})`;
+    descEl.textContent = product.description.replace("{material}", MATERIAL_LABEL[finish]);
+    priceEl.textContent = `$${product.price}`;
+    colorPicker.setAttribute("value", finish);
+    mainImage.src = product.images[finish];
+    mainImage.alt = `${product.name}, ${finish} finish`;
+  }
+
+  colorPicker.addEventListener("change", (e) => {
+    finish = e.detail.value;
+    renderProduct();
+  });
+
+  const addBtn = document.getElementById("pdpBranchAddBtn");
+  addBtn.addEventListener("click", () => {
+    Cart.add({ name: product.name, finish, price: product.price, image: product.images[finish] });
+    addBtn.textContent = "Added";
+    addBtn.classList.add("is-added");
+    setTimeout(() => {
+      addBtn.textContent = "Add To Bag";
+      addBtn.classList.remove("is-added");
+    }, 1200);
+  });
+
+  renderProduct();
+</script>
+</body>
+</html>

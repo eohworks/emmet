@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emmett — Components</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Gallery-page chrome only — not part of the product design system,
+     doesn't belong in styles.css. */
+  body { padding: 48px; max-width: 1000px; margin: 0 auto; background: #fff; }
+  .gallery-intro { margin-bottom: 56px; }
+  .gallery-intro h1 { font: 700 28px/1.2 system-ui, sans-serif; margin: 0 0 8px; }
+  .gallery-intro p { font: 14px/1.6 system-ui, sans-serif; color: #555; max-width: 640px; }
+  .gallery-section { margin-bottom: 72px; }
+  .gallery-section h2 {
+    font: 700 18px system-ui, sans-serif;
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 12px; margin-bottom: 24px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .badge { font: 700 10px system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+  .badge--done { background: #dcf5e3; color: #1a7a3a; }
+  .badge--draft { background: #fdf0d5; color: #9a6300; }
+  .gallery-desc { font: 13px/1.6 system-ui, sans-serif; color: #666; margin: 0 0 20px; max-width: 640px; }
+  .gallery-api { font: 12px/1.6 ui-monospace, monospace; color: #444; background: #f7f7f7; padding: 12px 16px; border-radius: 6px; margin: 0 0 20px; white-space: pre-wrap; }
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; align-items: start; }
+  .swatch-label { font: 600 11px system-ui, sans-serif; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .03em; }
+  .swatch { padding: 24px; background: #fafafa; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .card-demo-row { display: grid; grid-template-columns: repeat(2, 220px); gap: 2px; }
+  .nav-demo { position: relative; height: 72px; background: #1e1752; border-radius: 8px; overflow: hidden; }
+  .nav-demo emmet-nav .site-header { position: absolute; }
+  .footer-demo { border-radius: 8px; overflow: hidden; }
+  .log { font: 12px/1.5 ui-monospace, monospace; background: #14102f; color: #f5f5f5; padding: 12px 16px; border-radius: 6px; min-height: 20px; }
+</style>
+</head>
+<body>
+
+<div class="gallery-intro">
+  <h1>Emmett — Component Library</h1>
+  <p>Live Web Components, not screenshots — every state here is the real thing (real hover, real click, real animation), loading the actual <code>tokens.css</code>/<code>styles.css</code> the site ships with. Built in code first; settled designs get backported to the Figma "Components" page afterward, not the other way around.</p>
+</div>
+
+<div class="gallery-section">
+  <h2>Button <span class="badge badge--done">Complete</span></h2>
+  <p class="gallery-desc">Mirrors the Figma Button component's Size × State variants exactly. "Added" is externally driven (not self-timed) — click one below to see the event fire in the log; nothing here auto-reverts, because that 1.2s timing is cart business logic that belongs at the page level, not baked into the component. Hover any button to see the pink hover state — real CSS <code>:hover</code>, not a JS-toggled attribute, same as Product Card's hover treatment.</p>
+  <p class="gallery-api">&lt;emmet-button size="compact|large" state="default|added" label="Add To Bag"&gt;&lt;/emmet-button&gt;
+fires: "add-to-bag" (bubbles, composed)</p>
+  <div class="swatch-grid">
+    <div>
+      <div class="swatch-label">Compact / Default</div>
+      <div class="swatch"><emmet-button size="compact" state="default"></emmet-button></div>
+    </div>
+    <div>
+      <div class="swatch-label">Compact / Added</div>
+      <div class="swatch"><emmet-button size="compact" state="added"></emmet-button></div>
+    </div>
+    <div>
+      <div class="swatch-label">Large / Default</div>
+      <div class="swatch"><emmet-button size="large" state="default"></emmet-button></div>
+    </div>
+    <div>
+      <div class="swatch-label">Large / Added</div>
+      <div class="swatch"><emmet-button size="large" state="added"></emmet-button></div>
+    </div>
+  </div>
+  <p class="swatch-label" style="margin-top:20px;">Click to fire the event live</p>
+  <div class="swatch"><emmet-button id="liveButton" size="compact" state="default"></emmet-button></div>
+</div>
+
+<div class="gallery-section">
+  <h2>Product Card <span class="badge badge--done">Complete</span></h2>
+  <p class="gallery-desc">Mirrors the Figma Product Card component's Default/Hover variants — hover is real native CSS (<code>.product-card:hover</code> in styles.css), not a JS-toggled attribute, since it's a transient pointer state rather than logical state. Composes <code>&lt;emmet-button&gt;</code> internally, same as the Figma card composes a real Button instance. Hover over either card below.</p>
+  <p class="gallery-api">&lt;emmet-product-card name finish price image href variant="pack-shot|lifestyle"&gt;&lt;/emmet-product-card&gt;
+fires: "add-to-bag" (bubbles, composed, detail: {name, finish, price, image})</p>
+  <div class="card-demo-row">
+    <emmet-product-card
+      name="Item Two" finish="Silver" price="$675"
+      image="assets/item-two-silver.png" href="pdp.html?item=two&finish=silver">
+    </emmet-product-card>
+    <emmet-product-card
+      name="Item Three" finish="Gold" price="$675"
+      image="assets/item-three-gold.png" href="pdp.html?item=three&finish=gold">
+    </emmet-product-card>
+  </div>
+  <p class="swatch-label" style="margin-top:20px;">Lifestyle variant — editorial photography, not a pack shot. No border; name/finish/price/button stay hidden until hover, then fade in with the same pink hover color as the pack-shot variant. Hover the card below.</p>
+  <div class="card-demo-row">
+    <emmet-product-card
+      name="Item one" finish="Silver" price="$675" variant="lifestyle"
+      image="assets/lifestyle-necklace.jpg" href="pdp.html?item=one&finish=silver">
+    </emmet-product-card>
+  </div>
+</div>
+
+<div class="gallery-section">
+  <h2>Navigation <span class="badge badge--draft">Draft</span></h2>
+  <p class="gallery-desc">One variant, used identically on Home and PDP — transparent overlay floating over whatever's beneath it (hero image, product gallery, or the white details panel). Not yet swapped into either page's hand-written markup.</p>
+  <p class="gallery-api">&lt;emmet-nav&gt;&lt;/emmet-nav&gt;
+fires: "cart-open" (bubbles, composed)</p>
+  <div class="nav-demo"><emmet-nav></emmet-nav></div>
+</div>
+
+<div class="gallery-section">
+  <h2>Footer <span class="badge badge--draft">Draft</span></h2>
+  <p class="gallery-desc">Static content, identical on every page — no attributes needed.</p>
+  <p class="gallery-api">&lt;emmet-footer&gt;&lt;/emmet-footer&gt;</p>
+  <div class="footer-demo"><emmet-footer></emmet-footer></div>
+</div>
+
+<div class="gallery-section">
+  <h2>Cart Drawer <span class="badge badge--draft">Draft</span></h2>
+  <p class="gallery-desc">Wraps the existing cart.js pattern as real methods instead of ID-based DOM lookups. The Button/Product Card demos above and this drawer are already wired together on this page — try "Add To Bag" up in either section, then open the cart below.</p>
+  <p class="gallery-api">&lt;emmet-cart-drawer&gt;&lt;/emmet-cart-drawer&gt;
+methods: .open() .close() .addItem({name, finish, price, image})</p>
+  <button type="button" class="nav-link" style="background:#1e1752;color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;" id="openCartDemo">Open cart drawer</button>
+</div>
+
+<div class="gallery-section">
+  <h2>Color Picker <span class="badge badge--done">Complete</span></h2>
+  <p class="gallery-desc">Mirrors the redesigned Figma frame at node 23:9 (PDP page — not yet ported back to a real Figma component, so this is code-first for now). Both swatches sit bare side by side; the selected one gets a circular ring (reusing Button's own border/radius/padding tokens); a single label to the right names the current finish, instead of a label under each swatch. Now wired into the live PDP.</p>
+  <p class="gallery-api">&lt;emmet-color-picker value="silver" options="gold,silver"&gt;&lt;/emmet-color-picker&gt;
+fires: "change" (bubbles, composed, detail: {value})</p>
+  <div class="swatch" style="justify-content:flex-start;">
+    <emmet-color-picker id="finishDemo" value="silver" options="gold,silver"></emmet-color-picker>
+  </div>
+  <div class="log" id="finishLog">— no change yet —</div>
+</div>
+
+<div class="gallery-section">
+  <h2>Ticker <span class="badge badge--draft">Draft</span></h2>
+  <p class="gallery-api">&lt;emmet-ticker text="Free shipping on orders above $100"&gt;&lt;/emmet-ticker&gt;</p>
+  <emmet-ticker text="Free shipping on orders above $100"></emmet-ticker>
+</div>
+
+<div class="gallery-section">
+  <h2>Product Gallery <span class="badge badge--draft">Draft</span></h2>
+  <p class="gallery-desc">The one component whose layout genuinely differs by breakpoint — vertical stacked-scroll on desktop, horizontal snap-carousel + dots on mobile (resize the window to see it switch — same media query as the real PDP).</p>
+  <p class="gallery-api">&lt;emmet-product-gallery images="a.jpg,b.jpg"&gt;&lt;/emmet-product-gallery&gt;</p>
+  <div style="max-width:375px; height:400px; border:1px solid #e5e5e5; border-radius:8px; overflow:hidden;">
+    <emmet-product-gallery images="assets/item-two-silver.png,assets/character-art.jpg"></emmet-product-gallery>
+  </div>
+</div>
+
+<emmet-cart-drawer id="galleryCart"></emmet-cart-drawer>
+
+<script src="components.js"></script>
+<script>
+  const cart = document.getElementById("galleryCart");
+
+  document.getElementById("openCartDemo").addEventListener("click", () => cart.open());
+
+  document.addEventListener("add-to-bag", (e) => {
+    const detail = e.detail || { name: "Item", finish: "Silver", price: "$675", image: "" };
+    cart.addItem(detail);
+    cart.open();
+  });
+
+  const liveButton = document.getElementById("liveButton");
+  liveButton.addEventListener("add-to-bag", () => {
+    liveButton.setAttribute("state", "added");
+    setTimeout(() => liveButton.setAttribute("state", "default"), 1200);
+  });
+
+  document.getElementById("finishDemo").addEventListener("change", (e) => {
+    document.getElementById("finishLog").textContent = `change event fired — value: "${e.detail.value}"`;
+  });
+</script>
+</body>
+</html>
