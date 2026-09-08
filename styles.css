@@ -638,19 +638,16 @@ a { color: inherit; text-decoration: none; }
 
 /* ==========================================================================
    Home/PLP Branch — experimental variant (Figma node 50:67, "Home/PLP
-   branch"). A single full-viewport, non-scrolling hero: the cast photo
-   fills the whole screen at 75% opacity, and all 5 products sit on top as
-   a coverflow-style carousel instead of a scrolling grid. Cards have no
+   branch"). A full-viewport (100vh) hero: the cast photo fills the whole
+   screen at 75% opacity, with the site footer below it (so the page
+   scrolls past the hero to reveal the footer, unlike the fixed single-
+   screen version this started as). All 10 products sit on the hero as a
+   coverflow-style carousel instead of a scrolling grid. Cards have no
    background/border here (they float directly on the photo) and only the
    centered ("active") product shows its name/finish/price/button — the
    others are bare pendant images. Clicking a side pendant re-centers it;
-   clicking the already-centered one navigates to its PDP, same as a
-   regular product card would.
+   clicking the already-centered one navigates to its PDP branch page.
    ========================================================================== */
-
-.plp-branch-body {
-  overflow: hidden; /* one full-viewport screen, no page scroll */
-}
 
 .plp-branch-hero {
   position: relative;
@@ -969,16 +966,20 @@ a { color: inherit; text-decoration: none; }
     grid-column: 1 / -1;
   }
 
-  /* PLP Branch carousel: smaller slides/spacing so more than one neighbor
-     is still visible on a phone-width screen. index-branch.html's JS reads
-     --carousel-spacing back out of this element, so the two stay in sync
-     without duplicating the number in JS. */
-  .plp-branch-carousel {
-    --carousel-spacing: 170px;
-  }
-
+  /* PLP Branch carousel: smaller slides on a phone-width screen. Spacing
+     between slides is NOT set here on mobile — index-branch.html's JS
+     computes it as half the viewport width instead, so each neighbor's
+     own center lands exactly on the screen edge and gets cropped right at
+     its midpoint (a stronger "carousel" feel than an arbitrary px gap). */
   .plp-branch-slide {
     width: 220px;
+  }
+
+  /* Highlighted (active) card enlarges to span columns 2–11 of the page's
+     12-col grid (10/12 of the carousel's width, 1 column of margin each
+     side) — noticeably bigger than the 220px neighbors around it. */
+  .plp-branch-slide.is-active {
+    width: 83.3333%;
   }
 
   .product-grid {

@@ -14,7 +14,7 @@
 <body class="plp-branch-body">
 
 <header class="site-header">
-  <a href="index.html" class="nav-link">Shop</a>
+  <a href="index-branch.html" class="nav-link">Shop</a>
   <span class="site-logo" role="img" aria-label="Emmett">
     <span class="site-logo-svg" id="siteLogo"></span>
     <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
@@ -26,6 +26,19 @@
   <img class="plp-branch-hero-bg" src="assets/hero.jpg" alt="Five plush toy characters — the Emmett cast — standing side by side.">
   <div class="plp-branch-carousel" id="plpCarousel"></div>
 </main>
+
+<footer class="site-footer">
+  <div class="footer-mark" aria-hidden="true">
+    <span class="footer-mark-svg" id="footerMark"></span>
+    <span class="liquid-metal liquid-metal--symbol" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">About</a>
+    <a href="#" class="footer-link">Legal</a>
+    <a href="#" class="footer-link">Social</a>
+  </div>
+</footer>
 
 <div class="cart-overlay" id="cartOverlay"></div>
 <aside class="cart-drawer" id="cartDrawer">
@@ -43,6 +56,9 @@
 <script>
   fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
     document.getElementById("siteLogo").innerHTML = svg;
+  });
+  fetch("assets/svg/symbol.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("footerMark").innerHTML = svg;
   });
 
   // All 10 real products (every item x finish combination, same catalog as
@@ -65,11 +81,19 @@
 
   const carousel = document.getElementById("plpCarousel");
 
-  // Read from CSS (--carousel-spacing) rather than a hardcoded constant, so
-  // the mobile media query's smaller value takes effect automatically —
-  // including across an orientation change or window resize — without the
-  // spacing number having to be duplicated/kept in sync in JS.
+  // Desktop spacing is read from CSS (--carousel-spacing) so a design
+  // change there doesn't need a matching JS edit. Mobile is a special
+  // case: spacing = half the viewport width, so each neighbor's own
+  // center lands exactly on the screen edge and it visibly crops right at
+  // its midpoint — that only works as a live calculation against the
+  // current viewport width, not a fixed CSS value. 768px mirrors the same
+  // breakpoint used throughout styles.css.
+  const MOBILE_BREAKPOINT = "(max-width: 768px)";
+
   function getSpacing() {
+    if (window.matchMedia(MOBILE_BREAKPOINT).matches) {
+      return window.innerWidth / 2;
+    }
     return parseFloat(getComputedStyle(carousel).getPropertyValue("--carousel-spacing")) || 340;
   }
 
