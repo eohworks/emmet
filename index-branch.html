@@ -134,6 +134,21 @@
     positionSlides();
   }
 
+  // Touch devices have no hover, so the liquid-glass reveal instead flashes
+  // up briefly on whichever product a swipe just landed on, then fades back
+  // out — see the (hover: none) rule in styles.css for the actual visual.
+  let glassFlashTimeout = null;
+
+  function flashGlass() {
+    const activeEl = carousel.querySelector(".plp-branch-slide.is-active");
+    if (!activeEl) return;
+    clearTimeout(glassFlashTimeout);
+    activeEl.classList.add("is-glass-flash");
+    glassFlashTimeout = setTimeout(() => {
+      activeEl.classList.remove("is-glass-flash");
+    }, 1200);
+  }
+
   function buildSlides() {
     carousel.innerHTML = SLIDES.map((slide, i) => {
       const product = PRODUCTS[slide.item];
@@ -216,6 +231,7 @@
       } else {
         setActive(Math.max(0, activeIndex - 1));
       }
+      flashGlass();
     },
     { passive: true }
   );
