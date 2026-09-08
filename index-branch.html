@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Emmett — Home (Branch)</title>
-<link rel="icon" href="assets/logo.png">
+<link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Emmett — Home (Branch)">
+<meta property="og:image" content="https://themanofletters.github.io/emmet/assets/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://themanofletters.github.io/emmet/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
@@ -136,6 +140,7 @@
       const finishLabel = slide.finish.charAt(0).toUpperCase() + slide.finish.slice(1);
       return `
         <div class="plp-branch-slide${i === activeIndex ? " is-active" : ""}" data-index="${i}">
+          <div class="plp-branch-slide-glass" aria-hidden="true"></div>
           <div class="card-media"><img src="${product.images[slide.finish]}" alt="${product.name}, ${finishLabel} finish" draggable="false"></div>
           <div class="card-row card-row--top">
             <p class="card-name">${product.name}</p>
