@@ -184,9 +184,12 @@ class EmmetFooter extends HTMLElement {
 customElements.define("emmet-footer", EmmetFooter);
 
 // DRAFT — <emmet-cart-drawer>
-// Thin custom-element wrapper around the existing cart.js Cart singleton's
-// markup. open()/close()/addItem() are exposed as real methods so callers
-// don't need to know about the internal #cartDrawer/#cartOverlay ids.
+// Proposed fuller cart layout, built on top of the same tokens/patterns as
+// the rest of the site (button colors, spacing scale, card border color).
+// Adds what the shipped cart.js drawer doesn't have: a quantity stepper and
+// remove control per line item, a running subtotal, and a checkout CTA —
+// while keeping the same open()/close()/addItem() method surface so it can
+// still drop in wherever the plain drawer does today.
 class EmmetCartDrawer extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -198,6 +201,11 @@ class EmmetCartDrawer extends HTMLElement {
         </div>
         <p class="cart-empty" data-empty>Your bag is empty.</p>
         <div class="cart-items" data-items style="display:none"></div>
+        <div class="cart-summary" data-summary style="display:none">
+          <span>Subtotal</span>
+          <span data-subtotal></span>
+        </div>
+        <button type="button" class="cart-checkout-btn" data-checkout style="display:none">Checkout</button>
         <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
       </aside>
     `;
@@ -205,32 +213,91 @@ class EmmetCartDrawer extends HTMLElement {
     this.querySelector("[data-close]").addEventListener("click", () => this.close());
     this.querySelector("[data-overlay]").addEventListener("click", () => this.close());
   }
+
   open() {
     this.querySelector("[data-drawer]").classList.add("is-open");
     this.querySelector("[data-overlay]").classList.add("is-open");
   }
+
   close() {
     this.querySelector("[data-drawer]").classList.remove("is-open");
     this.querySelector("[data-overlay]").classList.remove("is-open");
   }
+
+  // Adding the same name+finish again bumps quantity instead of listing a
+  // duplicate row — matches how a real cart behaves.
   addItem(item) {
-    this._items.push(item);
+    const existing = this._items.find((it) => it.name === item.name && it.finish === item.finish);
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      this._items.push({ ...item, qty: 1 });
+    }
+    this._render();
+  }
+
+  _removeItem(index) {
+    this._items.splice(index, 1);
+    this._render();
+  }
+
+  _changeQty(index, delta) {
+    this._items[index].qty = Math.max(1, this._items[index].qty + delta);
+    this._render();
+  }
+
+  _render() {
     const empty = this.querySelector("[data-empty]");
     const list = this.querySelector("[data-items]");
-    empty.style.display = "none";
-    list.style.display = "flex";
+    const summary = this.querySelector("[data-summary]");
+    const checkout = this.querySelector("[data-checkout]");
+
+    const hasItems = this._items.length > 0;
+    empty.style.display = hasItems ? "none" : "block";
+    list.style.display = hasItems ? "flex" : "none";
+    summary.style.display = hasItems ? "flex" : "none";
+    checkout.style.display = hasItems ? "flex" : "none";
+    if (!hasItems) {
+      list.innerHTML = "";
+      return;
+    }
+
     list.innerHTML = this._items
       .map(
-        (it) => `
+        (it, i) => `
       <div class="cart-item">
         <img src="${it.image}" alt="">
-        <div>
-          <div class="cart-item-name">${it.name}</div>
+        <div class="cart-item-body">
+          <div class="cart-item-row">
+            <div class="cart-item-name">${it.name}</div>
+            <button type="button" class="cart-item-remove" data-remove="${i}" aria-label="Remove ${it.name}">&times;</button>
+          </div>
           <div class="cart-item-meta">${it.finish} · ${it.price}</div>
+          <div class="cart-qty">
+            <button type="button" class="cart-qty-btn" data-qty-down="${i}" aria-label="Decrease quantity">&minus;</button>
+            <span class="cart-qty-value">${it.qty}</span>
+            <button type="button" class="cart-qty-btn" data-qty-up="${i}" aria-label="Increase quantity">+</button>
+          </div>
         </div>
       </div>`
       )
       .join("");
+
+    const subtotal = this._items.reduce((sum, it) => {
+      const price = parseFloat(String(it.price).replace(/[^0-9.]/g, ""));
+      return sum + price * it.qty;
+    }, 0);
+    this.querySelector("[data-subtotal]").textContent = `$${subtotal}`;
+
+    list.querySelectorAll("[data-remove]").forEach((btn) => {
+      btn.addEventListener("click", () => this._removeItem(Number(btn.dataset.remove)));
+    });
+    list.querySelectorAll("[data-qty-down]").forEach((btn) => {
+      btn.addEventListener("click", () => this._changeQty(Number(btn.dataset.qtyDown), -1));
+    });
+    list.querySelectorAll("[data-qty-up]").forEach((btn) => {
+      btn.addEventListener("click", () => this._changeQty(Number(btn.dataset.qtyUp), 1));
+    });
   }
 }
 customElements.define("emmet-cart-drawer", EmmetCartDrawer);

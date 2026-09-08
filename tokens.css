@@ -78,7 +78,6 @@
   --font-tracking-product: var(--font-tracking-200);
   --font-tracking-footer-link: var(--font-tracking-100);
   --radius-full: var(--radius-pill);
-  --radius-banner: var(--radius-md);
   --space-card-padding: var(--space-200);
   --space-section-padding: var(--space-600);
   --space-inline-gap: var(--space-500);
@@ -116,7 +115,6 @@
   --footer-mark-fill: var(--color-accent-logo);
   --ticker-bg: var(--color-surface-inverse);
   --ticker-text-color: var(--color-accent-brand);
-  --ticker-radius: var(--radius-banner);
   --price-font-size: var(--font-size-product);
   --picker-swatch-fill-gold: var(--color-finish-gold);
   --picker-swatch-fill-silver: var(--color-finish-silver);

@@ -77,7 +77,7 @@ a { color: inherit; text-decoration: none; }
 .hero {
   position: relative;
   width: 100%;
-  aspect-ratio: 1599 / 997;
+  height: 90vh; /* was aspect-ratio-based (1599/997, matching the source image exactly) — 90vh instead so the next section peeks in below the fold as a scroll cue */
   background: var(--color-navy-900);
   overflow: hidden;
 }
@@ -230,7 +230,6 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 42px;
   background: var(--ticker-bg);
-  border-radius: var(--ticker-radius);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -241,7 +240,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: var(--space-500);
   white-space: nowrap;
-  animation: ticker-scroll 22s linear infinite;
+  animation: ticker-scroll 27.5s linear infinite; /* was 22s — slowed by 25% */
   padding-left: var(--space-500);
 }
 
@@ -638,10 +637,11 @@ a { color: inherit; text-decoration: none; }
 
 /* ==========================================================================
    Home/PLP Branch — experimental variant (Figma node 50:67, "Home/PLP
-   branch"). A full-viewport (100vh) hero: the cast photo fills the whole
-   screen at 75% opacity, with the site footer below it (so the page
-   scrolls past the hero to reveal the footer, unlike the fixed single-
-   screen version this started as). All 10 products sit on the hero as a
+   branch"). A near-full-viewport (90vh) hero: the cast photo fills most of
+   the screen at 75% opacity, deliberately 10vh short of full height so the
+   footer peeks in below the fold as a scroll cue, with the rest of the
+   footer reachable by scrolling (unlike the fixed single-screen version
+   this started as). All 10 products sit on the hero as a
    coverflow-style carousel instead of a scrolling grid. Cards have no
    background/border here (they float directly on the photo) and only the
    centered ("active") product shows its name/finish/price/button — the
@@ -651,7 +651,7 @@ a { color: inherit; text-decoration: none; }
 
 .plp-branch-hero {
   position: relative;
-  height: 100vh;
+  height: 90vh; /* was 100vh — leaves 10% of the next section peeking in below the fold as a scroll cue */
   overflow: hidden;
   background: var(--color-black);
 }
@@ -856,13 +856,15 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   gap: var(--space-300);
+  flex: 1; /* takes the remaining drawer height so it — not the whole drawer — is what scrolls when items overflow */
+  min-height: 0;
   overflow-y: auto;
 }
 
 .cart-item {
   display: flex;
   gap: var(--space-200);
-  align-items: center;
+  align-items: flex-start; /* was center — top-aligned now that the body is 3 stacked rows (name+remove, meta, qty), not a single line */
   border-bottom: var(--border-width-thin) solid var(--color-gray-200);
   padding-bottom: var(--space-300);
 }
@@ -875,10 +877,38 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--radius-md);
 }
 
+.cart-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+}
+
 .cart-item-name {
   font-family: var(--nav-font-family), sans-serif;
   font-size: 13px;
   color: var(--card-text-color);
+}
+
+.cart-item-remove {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--card-text-color);
+  opacity: 0.45;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.cart-item-remove:hover {
+  opacity: 1;
 }
 
 .cart-item-meta {
@@ -888,8 +918,72 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.6;
 }
 
+.cart-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-150);
+  margin-top: var(--space-150);
+}
+
+.cart-qty-btn {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--card-text-color);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cart-qty-value {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: 13px;
+  color: var(--card-text-color);
+  min-width: 16px;
+  text-align: center;
+}
+
+.cart-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-300);
+  padding-top: var(--space-300);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--price-font-size);
+  letter-spacing: var(--font-tracking-product);
+  color: var(--card-text-color);
+  text-transform: uppercase;
+}
+
+.cart-checkout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-300);
+  padding: var(--space-300) var(--space-500);
+  background: var(--button-bg-default);
+  color: var(--button-text-default);
+  border: none;
+  border-radius: var(--button-radius);
+  font-family: var(--button-font-family), sans-serif;
+  font-size: var(--price-font-size);
+  letter-spacing: var(--font-tracking-product);
+  cursor: pointer;
+}
+
+.cart-checkout-btn:hover {
+  background: var(--button-bg-hover);
+}
+
 .cart-note {
-  margin-top: auto;
   font-family: var(--font-family-text), sans-serif;
   font-size: 11px;
   color: var(--card-text-color);
@@ -915,7 +1009,7 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 768px) {
   .hero {
-    height: 100vh;
+    height: 90vh;
     aspect-ratio: auto;
   }
 
