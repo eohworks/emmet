@@ -172,10 +172,28 @@
     return window.matchMedia("(max-width: 768px)").matches ? 120 : 190;
   }
 
+  // Mobile's start state spans the full 12 columns inset by a margin (vs.
+  // desktop's centered columns 4–9) and sits bottom-anchored in the 75vh
+  // hero instead of vertically centered. LOGO_ASPECT_RATIO (the logo SVG's
+  // own viewBox ratio) lets us compute its rendered height from its width
+  // alone, since .hero-logo-svg is width:100%/height:auto and we need that
+  // height before layout to position "top" from it. MOBILE_LOGO_MARGIN
+  // matches the mobile ProductCard's own padding (--space-150, .card-row--top/
+  // --bottom) rather than the page's outer margin. Note: .hero-logo's CSS
+  // applies translate(-50%, -50%), so the "top" value this function
+  // computes is always the element's vertical CENTER, not its top edge —
+  // for the mobile bottom-anchor we solve for that center point given
+  // where we want the BOTTOM edge to land.
+  const LOGO_ASPECT_RATIO = 487.26 / 106.83; // assets/svg/logo.svg viewBox
+  const MOBILE_LOGO_MARGIN = 10; // was 16 (--space-300, the page margin) — now --space-150, matching ProductCard's padding
+
   function updateHeroLogo() {
     const progress = Math.min(1, Math.max(0, window.scrollY / SCROLL_RANGE));
-    const bigWidth = window.innerWidth * 0.5; // columns 4–9 of 12
-    const bigTop = window.innerHeight * 0.45; // vertically centered in the 90vh hero
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const bigWidth = isMobile ? window.innerWidth - MOBILE_LOGO_MARGIN * 2 : window.innerWidth * 0.5; // mobile: columns 1–12 inset by the side margins; desktop: columns 4–9 of 12
+    const bigTop = isMobile
+      ? window.innerHeight * 0.75 - MOBILE_LOGO_MARGIN - (bigWidth / LOGO_ASPECT_RATIO) / 2 // bottom edge sits at (75vh - margin); this is that edge minus half the logo's own height, to land its center there instead
+      : window.innerHeight * 0.45; // vertically centered in the 90vh hero
     const smallWidth = smallLogoWidth();
     const smallTop = 30; // vertically centered in the 60px header
 
