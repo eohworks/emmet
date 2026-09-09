@@ -6,9 +6,9 @@
 <title>Emmett — Product</title>
 <link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Emmett — Product">
-<meta property="og:image" content="https://themanofletters.github.io/emmet/assets/logo.png">
+<meta property="og:image" content="https://eohworks.github.io/emmet/assets/logo.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://themanofletters.github.io/emmet/assets/logo.png">
+<meta name="twitter:image" content="https://eohworks.github.io/emmet/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
@@ -20,10 +20,10 @@
 <div class="pdp-shell">
   <header class="site-header">
     <a href="index.html" class="nav-link">Shop</a>
-    <span class="site-logo" role="img" aria-label="Emmett">
+    <a href="index.html" class="site-logo" aria-label="Emmett home">
       <span class="site-logo-svg" id="siteLogo"></span>
       <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
-    </span>
+    </a>
     <a href="#" class="nav-link" id="cartLink">Cart</a>
   </header>
 
@@ -46,7 +46,7 @@
       <p class="pdp-description" id="pdpDescription"></p>
       <div class="pdp-bottom-row">
         <p class="pdp-price" id="pdpPrice"></p>
-        <button type="button" class="btn-bag btn-bag--large" id="pdpAddBtn">Add To Bag</button>
+        <button type="button" class="btn-bag btn-bag--large" id="pdpAddBtn">Add To Cart</button>
       </div>
 
       <p class="pdp-sku" id="pdpSku"></p>
@@ -70,10 +70,10 @@
 <div class="cart-overlay" id="cartOverlay"></div>
 <aside class="cart-drawer" id="cartDrawer">
   <div class="cart-drawer-head">
-    <span class="cart-title">Your Bag</span>
+    <span class="cart-title">Cart</span>
     <button class="cart-close" id="cartClose" aria-label="Close">&times;</button>
   </div>
-  <p class="cart-empty" id="cartEmpty">Your bag is empty.</p>
+  <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
   <div class="cart-items" id="cartItems" style="display:none"></div>
   <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
 </aside>
@@ -139,7 +139,7 @@
     addBtn.textContent = "Added";
     addBtn.classList.add("is-added");
     setTimeout(() => {
-      addBtn.textContent = "Add To Bag";
+      addBtn.textContent = "Add To Cart";
       addBtn.classList.remove("is-added");
     }, 1200);
   });

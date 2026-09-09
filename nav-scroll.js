@@ -6,7 +6,11 @@
   const header = document.querySelector(".site-header");
   if (!header) return;
 
-  const REVEAL_ZONE = 60; // always show while near the very top of the page
+  // Always show while near the very top of the page — 60px by default, or
+  // a page-specific override via data-reveal-zone (index.html sets this to
+  // its hero-logo animation's own SCROLL_RANGE, so the nav links stay put
+  // until that animation finishes instead of hiding mid-way through it).
+  const REVEAL_ZONE = Number(header.dataset.revealZone) || 60;
   const THRESHOLD = 4; // ignore sub-pixel/trackpad jitter
 
   let lastY = window.scrollY;

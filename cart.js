@@ -1,5 +1,5 @@
 // Client-side only cart drawer. Nothing here talks to a server —
-// it just tracks a count in memory for the session so "Add To Bag" feels real.
+// it just tracks a count in memory for the session so "Add To Cart" feels real.
 const Cart = (() => {
   let items = [];
 

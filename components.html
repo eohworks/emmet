@@ -6,9 +6,9 @@
 <title>Emmett — Components</title>
 <link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Emmett — Components">
-<meta property="og:image" content="https://themanofletters.github.io/emmet/assets/logo.png">
+<meta property="og:image" content="https://eohworks.github.io/emmet/assets/logo.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://themanofletters.github.io/emmet/assets/logo.png">
+<meta name="twitter:image" content="https://eohworks.github.io/emmet/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
@@ -52,7 +52,7 @@
 <div class="gallery-section">
   <h2>Button <span class="badge badge--done">Complete</span></h2>
   <p class="gallery-desc">Mirrors the Figma Button component's Size × State variants exactly. "Added" is externally driven (not self-timed) — click one below to see the event fire in the log; nothing here auto-reverts, because that 1.2s timing is cart business logic that belongs at the page level, not baked into the component. Hover any button to see the pink hover state — real CSS <code>:hover</code>, not a JS-toggled attribute, same as Product Card's hover treatment.</p>
-  <p class="gallery-api">&lt;emmet-button size="compact|large" state="default|added" label="Add To Bag"&gt;&lt;/emmet-button&gt;
+  <p class="gallery-api">&lt;emmet-button size="compact|large" state="default|added" label="Add To Cart"&gt;&lt;/emmet-button&gt;
 fires: "add-to-bag" (bubbles, composed)</p>
   <div class="swatch-grid">
     <div>
@@ -117,7 +117,7 @@ fires: "cart-open" (bubbles, composed)</p>
 
 <div class="gallery-section">
   <h2>Cart Drawer <span class="badge badge--draft">Draft</span></h2>
-  <p class="gallery-desc">Proposed fuller layout — the shipped cart.js drawer (used on the live pages today) only lists items with no way to change your mind once something's added. This version keeps the exact same look/tokens but adds a quantity stepper and remove control per line item, a running subtotal, and a checkout CTA. Adding the same item twice bumps its quantity instead of duplicating the row. Pre-loaded with two items below so you can see the full layout immediately — try the +/&minus;, the &times;, and adding more from the Button/Product Card demos above.</p>
+  <p class="gallery-desc">Proposed fuller layout — the shipped cart.js drawer (used on the live pages today) only lists items with no way to change your mind once something's added. This version keeps the exact same look/tokens but adds a quantity stepper per line item, a running subtotal, and a checkout CTA. There's no separate remove control — pressing "&minus;" at quantity 1 removes the item, so the stepper alone covers both. Adding the same item twice bumps its quantity instead of duplicating the row. Pre-loaded with two items below so you can see the full layout immediately — try the +/&minus; and adding more from the Button/Product Card demos above.</p>
   <p class="gallery-api">&lt;emmet-cart-drawer&gt;&lt;/emmet-cart-drawer&gt;
 methods: .open() .close() .addItem({name, finish, price, image})</p>
   <button type="button" class="nav-link" style="background:#1e1752;color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;" id="openCartDemo">Open cart drawer</button>

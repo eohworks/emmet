@@ -26,7 +26,7 @@ class EmmetButton extends HTMLElement {
   render() {
     const size = this.getAttribute("size") === "large" ? "large" : "compact";
     const state = this.getAttribute("state") === "added" ? "added" : "default";
-    const label = this.getAttribute("label") || "Add To Bag";
+    const label = this.getAttribute("label") || "Add To Cart";
 
     this.innerHTML = `<button type="button" class="btn-bag${size === "large" ? " btn-bag--large" : ""}${state === "added" ? " is-added" : ""}">${label}</button>`;
 
@@ -91,7 +91,7 @@ class EmmetProductCard extends HTMLElement {
         </div>
         <div class="card-row card-row--bottom">
           <p class="card-price">${price}</p>
-          <emmet-button label="Add To Bag"></emmet-button>
+          <emmet-button label="Add To Cart"></emmet-button>
         </div>
       </a>
     `;
@@ -196,10 +196,10 @@ class EmmetCartDrawer extends HTMLElement {
       <div class="cart-overlay" data-overlay></div>
       <aside class="cart-drawer" data-drawer>
         <div class="cart-drawer-head">
-          <span class="cart-title">Your Bag</span>
+          <span class="cart-title">Cart</span>
           <button class="cart-close" type="button" data-close aria-label="Close">&times;</button>
         </div>
-        <p class="cart-empty" data-empty>Your bag is empty.</p>
+        <p class="cart-empty" data-empty>Your cart is empty.</p>
         <div class="cart-items" data-items style="display:none"></div>
         <div class="cart-summary" data-summary style="display:none">
           <span>Subtotal</span>
@@ -241,8 +241,15 @@ class EmmetCartDrawer extends HTMLElement {
     this._render();
   }
 
+  // No separate remove control — pressing "−" at quantity 1 removes the
+  // line item instead of clamping there, so the stepper alone covers both.
   _changeQty(index, delta) {
-    this._items[index].qty = Math.max(1, this._items[index].qty + delta);
+    const nextQty = this._items[index].qty + delta;
+    if (nextQty < 1) {
+      this._removeItem(index);
+      return;
+    }
+    this._items[index].qty = nextQty;
     this._render();
   }
 
@@ -268,13 +275,10 @@ class EmmetCartDrawer extends HTMLElement {
       <div class="cart-item">
         <img src="${it.image}" alt="">
         <div class="cart-item-body">
-          <div class="cart-item-row">
-            <div class="cart-item-name">${it.name}</div>
-            <button type="button" class="cart-item-remove" data-remove="${i}" aria-label="Remove ${it.name}">&times;</button>
-          </div>
+          <div class="cart-item-name">${it.name}</div>
           <div class="cart-item-meta">${it.finish} · ${it.price}</div>
           <div class="cart-qty">
-            <button type="button" class="cart-qty-btn" data-qty-down="${i}" aria-label="Decrease quantity">&minus;</button>
+            <button type="button" class="cart-qty-btn" data-qty-down="${i}" aria-label="${it.qty === 1 ? `Remove ${it.name}` : "Decrease quantity"}">&minus;</button>
             <span class="cart-qty-value">${it.qty}</span>
             <button type="button" class="cart-qty-btn" data-qty-up="${i}" aria-label="Increase quantity">+</button>
           </div>
@@ -289,9 +293,6 @@ class EmmetCartDrawer extends HTMLElement {
     }, 0);
     this.querySelector("[data-subtotal]").textContent = `$${subtotal}`;
 
-    list.querySelectorAll("[data-remove]").forEach((btn) => {
-      btn.addEventListener("click", () => this._removeItem(Number(btn.dataset.remove)));
-    });
     list.querySelectorAll("[data-qty-down]").forEach((btn) => {
       btn.addEventListener("click", () => this._changeQty(Number(btn.dataset.qtyDown), -1));
     });

@@ -72,13 +72,43 @@ a { color: inherit; text-decoration: none; }
   height: auto;
 }
 
+/* Regular index only — the logo starts large, centered over columns 4–9 of
+   the hero (50vw), and index.html's own script animates it down to the
+   navbar's exact size/position as the page scrolls, then leaves it there
+   ("sticks") since position:fixed + clamped JS values naturally stop
+   changing once the scroll animation completes. Replaces .site-logo for
+   this page only — other pages keep the plain static nav logo. Width/top
+   below are just sane pre-JS defaults matching the resting (scroll:0)
+   state; the script overwrites them on load and on every scroll/resize. */
+.hero-logo {
+  position: fixed;
+  left: 50%;
+  top: 45vh;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  z-index: 21;
+  display: block; /* was a <div>, now an <a> linking back to Index — block keeps its fixed-position sizing/layout identical */
+}
+
+.hero-logo-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hero-logo-svg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* ---------- Hero ---------- */
 
 .hero {
   position: relative;
   width: 100%;
   height: 90vh; /* was aspect-ratio-based (1599/997, matching the source image exactly) — 90vh instead so the next section peeks in below the fold as a scroll cue */
-  background: var(--color-navy-900);
+  background: var(--color-surface-inverse);
   overflow: hidden;
 }
 
@@ -86,6 +116,8 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform-origin: center center; /* scroll-driven scale-up (index.html's updateHeroScale) grows from the center; .hero's overflow:hidden clips the excess */
+  will-change: transform;
 }
 
 /* ---------- Shop grid ---------- */
@@ -282,9 +314,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ---------- Liquid metal ambient shimmer ----------
-   A rotating highlight gradient masked to the exact glyph/symbol shape, so the
-   silhouette stays put and only the "light" moves inside it — reads as a moving
-   reflection across liquid metal rather than a shape sliding around. */
+   Several soft highlight/shadow blobs drifting independently (background-
+   position, not a rotation transform) masked to the exact glyph/symbol
+   shape — reads as light wandering unpredictably across liquid metal,
+   rather than one beam spinning around a fixed center. Irregular keyframe
+   spacing (0/22/41/63/85%) means each leg of the drift takes a different
+   amount of time, avoiding a mechanical, evenly-paced loop. */
 
 .liquid-metal {
   position: absolute;
@@ -316,32 +351,31 @@ a { color: inherit; text-decoration: none; }
 
 .liquid-metal-spin {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 340%;
-  height: 340%;
-  transform: translate(-50%, -50%) rotate(0deg);
-  transform-origin: center;
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(0, 0, 0, 0.3) 0deg,
-    transparent 9deg,
-    rgba(255, 255, 255, 1) 18deg,
-    transparent 27deg,
-    rgba(0, 0, 0, 0.18) 36deg,
-    transparent 45deg
-  );
-  animation: liquid-metal-spin 9s linear infinite;
-  will-change: transform;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.95) 0%, transparent 30%),
+    radial-gradient(circle at 68% 62%, rgba(255, 255, 255, 0.55) 0%, transparent 26%),
+    radial-gradient(circle at 45% 80%, rgba(0, 0, 0, 0.28) 0%, transparent 34%);
+  background-size: 220% 220%;
+  background-repeat: no-repeat;
+  animation: liquid-metal-drift 8s ease-in-out infinite; /* was 12s — 50% faster */
+  will-change: background-position;
 }
 
+/* Different duration + a negative delay (starts partway into its own
+   cycle) so the symbol's shimmer never moves in lockstep with the logo's. */
 .liquid-metal--symbol .liquid-metal-spin {
-  animation-duration: 7s;
-  animation-direction: reverse;
+  animation-duration: 10s; /* was 15s — 50% faster */
+  animation-delay: -4s;
 }
 
-@keyframes liquid-metal-spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+@keyframes liquid-metal-drift {
+  0%   { background-position: 10% 20%, 90% 80%, 50% 100%; }
+  22%  { background-position: 70% 10%, 20% 60%, 85% 30%; }
+  41%  { background-position: 90% 70%, 60% 15%, 10% 55%; }
+  63%  { background-position: 30% 90%, 80% 40%, 60% 10%; }
+  85%  { background-position: 15% 45%, 40% 85%, 90% 65%; }
+  100% { background-position: 10% 20%, 90% 80%, 50% 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -490,7 +524,7 @@ a { color: inherit; text-decoration: none; }
 
 .pdp-description {
   font-family: var(--font-family-text), sans-serif;
-  font-size: 14px;
+  font-size: var(--font-size-product); /* was a hardcoded 14px */
   line-height: 1.6;
   color: var(--card-text-color);
   opacity: 0.85;
@@ -514,7 +548,7 @@ a { color: inherit; text-decoration: none; }
 
 .pdp-sku {
   font-family: var(--font-family-text), sans-serif;
-  font-size: 12px;
+  font-size: var(--font-size-footer-link); /* was a hardcoded 12px */
   color: var(--card-text-color);
   opacity: 0.45;
   margin-top: var(--space-600);
@@ -566,19 +600,20 @@ a { color: inherit; text-decoration: none; }
    (hero image + additional-images row combined) — this is what gives the
    sticky card below room to travel through both sections and only release
    right at the footer, instead of sticking forever like position:fixed
-   would. Same 12-col grid as the gallery so the card can share the image's
-   exact column span. */
+   would. Same 12-col grid as the gallery so the card can position itself
+   against the same column tracks. */
 .pdp-branch-card-wrap {
   position: absolute;
   inset: 0;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   align-items: end; /* anchors the card's resting position to the bottom of the (tall) wrap, matching its bottom-sticky behavior — grid's default stretch would otherwise make it fill the wrap's full (image-column-height) row axis instead of sizing to its own content */
+  padding: 0 var(--space-500); /* same page margin as .site-header/.cart-drawer, so the card's right edge doesn't sit flush against the viewport */
   pointer-events: none; /* only the card itself should intercept clicks */
 }
 
 .pdp-branch-card {
-  grid-column: 4 / 10; /* centered on the product image's own 6-of-12 span */
+  grid-column: 9 / 13; /* columns 9–12 inclusive: 4 of 12, right-aligned */
   position: sticky;
   bottom: var(--space-500);
   width: 100%;
@@ -737,20 +772,6 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
-/* Touch devices have no real hover, so the glass instead flashes up
-   briefly whenever a swipe lands on a new product (see the swipe handler
-   in index-branch.html, which toggles .is-glass-flash and clears it again
-   after ~1.2s) — same visual treatment, different trigger. */
-@media (hover: none) {
-  .plp-branch-slide.is-active.is-glass-flash {
-    border-radius: 24px;
-  }
-
-  .plp-branch-slide.is-active.is-glass-flash .plp-branch-slide-glass {
-    opacity: 1;
-  }
-}
-
 /* No background/border (unlike .product-card) — the image sits straight
    on the hero photo. Name/finish/price/button reuse the exact same
    .card-row/.card-name/.card-finish/.card-price/.btn-bag classes as the
@@ -804,6 +825,14 @@ a { color: inherit; text-decoration: none; }
   pointer-events: auto;
 }
 
+/* Branch pages: the glass drawer floats as its own card rather than a
+   flush edge-to-edge panel, so it doesn't need the rest of the page dimmed
+   behind it — pointer-events stays auto (clicking outside the drawer still
+   closes it via cart.js), only the visible darkening is dropped. */
+.cart-overlay--glass.is-open {
+  opacity: 0;
+}
+
 .cart-drawer {
   position: fixed;
   top: 0;
@@ -819,6 +848,34 @@ a { color: inherit; text-decoration: none; }
   padding: var(--space-600) var(--space-500);
 }
 
+/* Liquid glass variant — branch pages only (pdp-branch.html, index-branch.html
+   opt in via this modifier class). Same frosted-panel recipe as the PDP
+   branch's sticky card and the PLP branch's hover reveal: translucent white,
+   blurred backdrop, soft highlight border. Inset from all four edges by the
+   page margin (same --space-500/--space-300 used elsewhere for the page's
+   desktop/mobile margins) instead of flush against the viewport, so it now
+   reads as a floating card like those other glass panels — border-radius
+   and an all-around border/shadow (rather than just the left edge) follow
+   from that. */
+.cart-drawer--glass {
+  top: var(--space-500);
+  right: var(--space-500);
+  bottom: var(--space-500);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px; /* matches .pdp-branch-card's radius */
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(30, 23, 82, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* translateX(100%) alone (the base rule) only clears a panel that sits
+     flush against the edge (right:0) — now that this variant has a
+     right-margin gap, closed still left that gap's width peeking on
+     screen, so travel that extra distance too. */
+  transform: translateX(calc(100% + var(--space-500)));
+}
+
 .cart-drawer.is-open {
   transform: translateX(0);
 }
@@ -832,7 +889,7 @@ a { color: inherit; text-decoration: none; }
 
 .cart-title {
   font-family: var(--nav-font-family), sans-serif;
-  font-size: 18px;
+  font-size: var(--nav-font-size); /* was a hardcoded 18px — now matches the navbar's own Cart link exactly */
   color: var(--card-text-color);
   text-transform: uppercase;
 }
@@ -840,7 +897,7 @@ a { color: inherit; text-decoration: none; }
 .cart-close {
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: var(--font-size-nav); /* was a hardcoded 22px — nearest existing token, pending a real Figma value */
   color: var(--card-text-color);
   line-height: 1;
 }
@@ -849,7 +906,7 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-family-text), sans-serif;
   color: var(--card-text-color);
   opacity: 0.6;
-  font-size: 14px;
+  font-size: var(--font-size-product); /* was a hardcoded 14px */
 }
 
 .cart-items {
@@ -882,38 +939,15 @@ a { color: inherit; text-decoration: none; }
   min-width: 0;
 }
 
-.cart-item-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-200);
-}
-
 .cart-item-name {
   font-family: var(--nav-font-family), sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-product); /* was a hardcoded 13px — nearest existing token, pending a real Figma value */
   color: var(--card-text-color);
-}
-
-.cart-item-remove {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 16px;
-  line-height: 1;
-  color: var(--card-text-color);
-  opacity: 0.45;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.cart-item-remove:hover {
-  opacity: 1;
 }
 
 .cart-item-meta {
   font-family: var(--font-family-text), sans-serif;
-  font-size: 12px;
+  font-size: var(--font-size-product); /* was --font-size-footer-link (font-size-100) */
   color: var(--card-text-color);
   opacity: 0.6;
 }
@@ -935,14 +969,14 @@ a { color: inherit; text-decoration: none; }
   border: var(--border-width-thin) solid var(--color-border-subtle);
   border-radius: var(--radius-pill);
   color: var(--card-text-color);
-  font-size: 14px;
+  font-size: var(--font-size-product); /* was a hardcoded 14px */
   line-height: 1;
   cursor: pointer;
 }
 
 .cart-qty-value {
   font-family: var(--font-family-text), sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-product); /* was a hardcoded 13px — nearest existing token, pending a real Figma value */
   color: var(--card-text-color);
   min-width: 16px;
   text-align: center;
@@ -985,7 +1019,7 @@ a { color: inherit; text-decoration: none; }
 
 .cart-note {
   font-family: var(--font-family-text), sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-product); /* was --font-size-footer-link (font-size-100) */
   color: var(--card-text-color);
   opacity: 0.45;
   padding-top: var(--space-300);
@@ -1013,44 +1047,12 @@ a { color: inherit; text-decoration: none; }
     aspect-ratio: auto;
   }
 
-  /* Image is sized by height only (width follows its natural ratio), so it
-     renders wider than the viewport — that overflow is what .hero clips, and
-     what the pan animates across. max-width:none overrides the global
-     img{max-width:100%} reset, which would otherwise cap it at 100vw and kill
-     the overflow entirely. */
-  .hero img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: auto;
-    max-width: none;
-    height: 100%;
-    object-fit: unset;
-    animation: hero-pan 24s ease-in-out infinite alternate;
-  }
-
-  /* translateX in % resolves against the image's own rendered width, so this
-     end position — self-width shifted left, then compensated by the viewport
-     width — always lands exactly on the image's right edge regardless of the
-     photo's actual aspect ratio (no hardcoded ratio constant to keep in sync
-     with whichever file ends up at assets/hero.jpg). */
-  @keyframes hero-pan {
-    from { transform: translateX(0); }
-    to { transform: translateX(calc(-100% + 100vw)); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero img {
-      animation: none;
-    }
-  }
-
   .site-header {
     padding: var(--space-150) var(--space-300);
   }
 
   .nav-link {
-    font-size: 18px;
+    font-size: var(--font-size-product); /* was a hardcoded 18px — nearest existing token, pending a real Figma value */
   }
 
   .site-logo {
@@ -1123,6 +1125,20 @@ a { color: inherit; text-decoration: none; }
     grid-column: 1 / -1;
   }
 
+  /* Cart drawer (branch pages, glass variant): spans the full 12-column
+     width instead of the desktop's fixed min(380px, 90vw) panel, inset by
+     the same mobile page margin (--space-300) used by .site-header and
+     .pdp-branch-card-wrap above — width:auto lets the left/right insets
+     size it instead of the inherited fixed width. */
+  .cart-drawer--glass {
+    top: var(--space-300);
+    right: var(--space-300);
+    bottom: var(--space-300);
+    left: var(--space-300);
+    width: auto;
+    transform: translateX(calc(100% + var(--space-300))); /* mobile's own margin gap — see the desktop rule's comment */
+  }
+
   /* PLP Branch carousel: smaller slides on a phone-width screen. Spacing
      between slides is NOT set here on mobile — index-branch.html's JS
      computes it as half the viewport width instead, so each neighbor's
@@ -1152,12 +1168,12 @@ a { color: inherit; text-decoration: none; }
   .card-name,
   .card-finish,
   .card-price {
-    font-size: 12px;
+    font-size: var(--font-size-footer-link); /* was a hardcoded 12px */
   }
 
   .btn-bag {
     padding: var(--space-050) var(--space-150);
-    font-size: 12px;
+    font-size: var(--font-size-footer-link); /* was a hardcoded 12px */
   }
 
   /* Without this, .btn-bag--large silently collapses to the compact mobile
@@ -1170,7 +1186,7 @@ a { color: inherit; text-decoration: none; }
   }
 
   .ticker-track span {
-    font-size: 18px;
+    font-size: var(--font-size-product); /* was a hardcoded 18px — nearest existing token, pending a real Figma value */
   }
 
   .footer-links {
