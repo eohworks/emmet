@@ -196,6 +196,12 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
+/* Both the lifestyle crossfade above and the shimmer below are desktop-only
+   for now (dropped on mobile rather than converted) — touch devices don't
+   have a real hover state, and some mobile browsers apply :hover on tap,
+   which would trigger these as an unintended side effect of the very tap
+   that navigates to the PDP. */
+
 /* Regular Index only — a hover-triggered shimmer over the card's image,
    same recipe as .liquid-metal/.liquid-metal-spin (multi-radial-gradient
    blobs drifting via background-position, blended with mix-blend-mode:
@@ -228,8 +234,10 @@ a { color: inherit; text-decoration: none; }
   opacity: 0;
 }
 
-.product-card:hover .card-shimmer::after {
-  animation: card-shimmer-drift 0.5s ease-in-out 1 forwards; /* was 1s — half the duration, same keyframe shape; plays once per hover, and still fades opacity back to 0 at the end so re-hovering starts from a clean, unaffected image */
+@media (min-width: 769px) {
+  .product-card:hover .card-shimmer::after {
+    animation: card-shimmer-drift 0.5s ease-in-out 1 forwards; /* was 1s — half the duration, same keyframe shape; plays once per hover, and still fades opacity back to 0 at the end so re-hovering starts from a clean, unaffected image */
+  }
 }
 
 @keyframes card-shimmer-drift {
@@ -520,7 +528,7 @@ a { color: inherit; text-decoration: none; }
 
 .pdp-gallery {
   width: 100%;
-  background: var(--color-navy-900);
+  background: var(--color-surface-inverse); /* was the raw --color-navy-900 primitive — same value in every existing theme, but bypassed the neutral theme's override since that only touches the semantic tier */
 }
 
 .pdp-gallery img {

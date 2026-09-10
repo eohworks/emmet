@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en" data-theme="neutral">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emmett — Home (Neutral)</title>
+<link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="theme-neutral.css">
+<script src="nav-scroll.js" defer></script>
+</head>
+<body>
+
+<header class="site-header" data-reveal-zone="400">
+  <a href="index-neutral.html" class="nav-link">Shop</a>
+  <a href="#" class="nav-link" id="cartLink">Cart</a>
+</header>
+
+<!-- --nav-logo-fill overridden locally to a mid-gray: the neutral theme
+     sets --color-accent-logo (and so --nav-logo-fill) to pure black, but
+     the chrome shimmer below is a mix-blend-mode:overlay effect — overlay
+     blended onto a black backdrop stays black, so the shimmer needs a
+     lighter base to actually show. Same gray used in the components.html
+     chrome draft. -->
+<a href="index-neutral.html" class="hero-logo" id="heroLogo" aria-label="Emmett home" style="--nav-logo-fill:#9a9a9a;">
+  <span class="hero-logo-svg" id="siteLogo"></span>
+  <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+</a>
+
+<section class="hero">
+  <img src="assets/hero.jpg" alt="Five plush toy characters — the Emmett cast — standing side by side.">
+</section>
+
+<main class="shop">
+  <div class="product-grid" id="productGrid"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-mark" aria-hidden="true">
+    <span class="footer-mark-svg" id="footerMark"></span>
+    <span class="liquid-metal liquid-metal--symbol liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">About</a>
+    <a href="#" class="footer-link">Legal</a>
+    <a href="#" class="footer-link">Social</a>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head">
+    <span class="cart-title">Cart</span>
+    <button class="cart-close" id="cartClose" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 1L15 15M15 1L1 15"/></svg></button>
+  </div>
+  <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
+  <div class="cart-items" id="cartItems" style="display:none"></div>
+  <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
+</aside>
+
+<script src="products.js"></script>
+<script src="cart.js"></script>
+<script>
+  // 2 spread (2-col) + 4 grid (4-col) + 2 spread (2-col) + 4 grid (4-col).
+  const SECTIONS = [
+    {
+      type: "spread",
+      cards: [
+        { name: "Item Five", finish: "Silver", image: "assets/item-five-silver.png" },
+        { name: "Item one", finish: "Silver", image: "assets/Tounge.jpg", lifestyle: true },
+      ],
+    },
+    {
+      type: "grid",
+      cards: [
+        { name: "Item Two", finish: "Silver", image: "assets/item-two-silver.png" },
+        { name: "Item Two", finish: "Gold", image: "assets/item-two-gold.png" },
+        { name: "Item Three", finish: "Silver", image: "assets/item-three-silver.png" },
+        { name: "Item Three", finish: "Gold", image: "assets/item-three-gold.png" },
+      ],
+    },
+    {
+      type: "spread",
+      cards: [
+        { name: "Item one", finish: "Silver", image: "assets/character-art.jpg", lifestyle: true },
+        { name: "Item Five", finish: "Gold", image: "assets/item-five-gold.png" },
+      ],
+    },
+    {
+      type: "grid",
+      cards: [
+        { name: "Item Four", finish: "§", image: "assets/item-four-silver.png" },
+        { name: "Item Four", finish: "Gold", image: "assets/item-four-gold.png" },
+        { name: "Item One", finish: "Silver", image: "assets/item-one-silver.png" },
+        { name: "Item One", finish: "Gold", image: "assets/item-one-gold.png" },
+      ],
+    },
+  ];
+
+  function cardHTML(card, isSpread) {
+    const item = card.name.replace(/^Item /i, "").toLowerCase();
+    const finish = card.finish.toLowerCase() === "gold" ? "gold" : "silver";
+    const href = `pdp-neutral.html?item=${item}&finish=${finish}`;
+    const classes = ["product-card", isSpread && "span-2", card.lifestyle && "product-card--lifestyle"]
+      .filter(Boolean)
+      .join(" ");
+    return `
+      <a href="${href}" class="${classes}">
+        <div class="card-media">
+          <img src="${card.image}" alt="${card.name}, ${card.finish} finish">
+          ${card.lifestyle ? "" : `<img class="card-media-hover" src="assets/lifestyle-necklace.jpg" alt="" aria-hidden="true">`}
+        </div>
+        ${card.lifestyle ? "" : '<span class="card-shimmer" aria-hidden="true"></span>'}
+        <div class="card-row card-row--top">
+          <p class="card-name">${card.name}</p>
+          <p class="card-finish">${card.finish}</p>
+        </div>
+        <div class="card-row card-row--bottom">
+          <p class="card-price">$675</p>
+        </div>
+      </a>
+    `;
+  }
+
+  // Inline the real brand SVGs so their internal fill (a CSS var referencing the
+  // design tokens) resolves against this document's :root — an <img src="*.svg">
+  // would render as an opaque image and couldn't see our custom properties.
+  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("siteLogo").innerHTML = svg;
+  });
+  fetch("assets/svg/symbol.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("footerMark").innerHTML = svg;
+  });
+
+  // Hero logo scroll animation: starts big (50vw, centered over the hero)
+  // and shrinks/moves to the navbar's exact size/position over SCROLL_RANGE
+  // px of scroll, then "sticks" there — the position:fixed element just
+  // stops changing once progress clamps to 1, so nothing extra is needed
+  // to hold it in place for the rest of the scroll. Unlike index.html, this
+  // page does NOT also fade --nav-logo-fill on scroll — the grey-to-pink
+  // fade doesn't fit a neutral theme, and would fight the static gray this
+  // page sets so the chrome shimmer stays visible (see the inline style on
+  // #heroLogo above).
+  const heroLogo = document.getElementById("heroLogo");
+  const SCROLL_RANGE = 400; // keep in sync with .site-header's data-reveal-zone above (nav-scroll.js) — that's a static HTML attribute rather than set from here, since nav-scroll.js runs as a deferred script and can execute before this inline one sets any value.
+
+  function smallLogoWidth() {
+    return window.matchMedia("(max-width: 768px)").matches ? 120 : 190;
+  }
+
+  // Mobile's start state spans the full 12 columns inset by a margin (vs.
+  // desktop's centered columns 4–9) and sits bottom-anchored in the 75vh
+  // hero instead of vertically centered. LOGO_ASPECT_RATIO (the logo SVG's
+  // own viewBox ratio) lets us compute its rendered height from its width
+  // alone, since .hero-logo-svg is width:100%/height:auto and we need that
+  // height before layout to position "top" from it. MOBILE_LOGO_MARGIN
+  // matches the mobile ProductCard's own padding (--space-150, .card-row--top/
+  // --bottom) rather than the page's outer margin. Note: .hero-logo's CSS
+  // applies translate(-50%, -50%), so the "top" value this function
+  // computes is always the element's vertical CENTER, not its top edge —
+  // for the mobile bottom-anchor we solve for that center point given
+  // where we want the BOTTOM edge to land.
+  const LOGO_ASPECT_RATIO = 487.26 / 106.83; // assets/svg/logo.svg viewBox
+  const MOBILE_LOGO_MARGIN = 10; // was 16 (--space-300, the page margin) — now --space-150, matching ProductCard's padding
+
+  function updateHeroLogo() {
+    const progress = Math.min(1, Math.max(0, window.scrollY / SCROLL_RANGE));
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const bigWidth = isMobile ? window.innerWidth - MOBILE_LOGO_MARGIN * 2 : window.innerWidth * 0.5; // mobile: columns 1–12 inset by the side margins; desktop: columns 4–9 of 12
+    const bigTop = isMobile
+      ? window.innerHeight * 0.75 - MOBILE_LOGO_MARGIN - (bigWidth / LOGO_ASPECT_RATIO) / 2 // bottom edge sits at (75vh - margin); this is that edge minus half the logo's own height, to land its center there instead
+      : window.innerHeight * 0.45; // vertically centered in the 90vh hero
+    const smallWidth = smallLogoWidth();
+    const smallTop = 30; // vertically centered in the 60px header
+
+    heroLogo.style.width = `${bigWidth + (smallWidth - bigWidth) * progress}px`;
+    heroLogo.style.top = `${bigTop + (smallTop - bigTop) * progress}px`;
+  }
+
+  window.addEventListener("scroll", updateHeroLogo, { passive: true });
+  window.addEventListener("resize", updateHeroLogo);
+  updateHeroLogo();
+
+  // Hero image scale: the png grows from 100% to HERO_SCALE_MAX over the
+  // same SCROLL_RANGE as the logo animation above (so it settles in step
+  // with it), instead of the translate-based parallax this replaces —
+  // .hero's overflow:hidden clips the excess as it grows, no extra
+  // headroom/sizing tricks needed the way the old translate did.
+  const heroImg = document.querySelector(".hero img");
+  const HERO_SCALE_MAX = 1.5;
+
+  function updateHeroScale() {
+    const progress = Math.min(1, Math.max(0, window.scrollY / SCROLL_RANGE));
+    const scale = 1 + (HERO_SCALE_MAX - 1) * progress;
+    heroImg.style.transform = `scale(${scale})`;
+  }
+
+  window.addEventListener("scroll", updateHeroScale, { passive: true });
+  window.addEventListener("resize", updateHeroScale);
+  updateHeroScale();
+
+  const grid = document.getElementById("productGrid");
+  grid.innerHTML = SECTIONS.map((section) => {
+    const isSpread = section.type === "spread";
+    return section.cards.map((c) => cardHTML(c, isSpread)).join("");
+  }).join("");
+</script>
+</body>
+</html>
