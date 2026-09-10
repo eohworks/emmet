@@ -152,10 +152,8 @@ a { color: inherit; text-decoration: none; }
 
 /* Lifestyle variant — editorial/lifestyle photography instead of a plain
    product pack shot. No border (the photo runs to the card edge); name/
-   finish/price/button stay hidden until hover, then revealed in the same
-   pink hover color as the pack-shot variant (.product-card:hover ... below
-   already covers this, since these cards keep the base .product-card class
-   too — no separate color rule needed here). */
+   finish/price/button stay hidden always, not just until hover — these
+   cards are pure image tiles, click-through to the PDP for details. */
 .product-card--lifestyle {
   border: none;
   margin-left: 0;
@@ -165,12 +163,6 @@ a { color: inherit; text-decoration: none; }
 .product-card--lifestyle .card-row {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-
-.product-card--lifestyle:hover .card-row {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .card-media {
@@ -183,6 +175,74 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Regular Index, desktop only — crosses over to a lifestyle/model photo on
+   hover instead of the plain pack-shot. Reuses one generic lifestyle image
+   for every card for now (no per-product on-model photography exists yet);
+   swap the src in index.html's cardHTML() once real per-item shots exist.
+   Sits in normal DOM order right after the pack-shot img, so it paints on
+   top within .card-media's own stacking context without needing z-index. */
+.card-media-hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+@media (min-width: 769px) {
+  .product-card:hover .card-media-hover {
+    opacity: 1;
+  }
+}
+
+/* Regular Index only — a hover-triggered shimmer over the card's image,
+   same recipe as .liquid-metal/.liquid-metal-spin (multi-radial-gradient
+   blobs drifting via background-position, blended with mix-blend-mode:
+   overlay so it reads on top of an opaque photo) but as its own element:
+   that one is a permanent ambient effect on the logo/swatches, this one
+   plays once per hover and fades itself back out — the image must end up
+   unaffected, not left tinted by a frozen last frame, even if the pointer
+   stays put well past the animation's own duration. z-index:1 (tied with
+   .card-row) but earlier in the DOM, so the name/finish/price text still
+   paints on top of it. */
+.card-shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.card-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.95) 0%, transparent 30%),
+    radial-gradient(circle at 68% 62%, rgba(255, 255, 255, 0.55) 0%, transparent 26%),
+    radial-gradient(circle at 45% 80%, rgba(0, 0, 0, 0.28) 0%, transparent 34%);
+  background-size: 220% 220%;
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+
+.product-card:hover .card-shimmer::after {
+  animation: card-shimmer-drift 0.5s ease-in-out 1 forwards; /* was 1s — half the duration, same keyframe shape; plays once per hover, and still fades opacity back to 0 at the end so re-hovering starts from a clean, unaffected image */
+}
+
+@keyframes card-shimmer-drift {
+  0%   { opacity: 0; background-position: 10% 20%, 90% 80%, 50% 100%; }
+  15%  { opacity: 0.75; }
+  85%  { opacity: 0.75; }
+  100% { opacity: 0; background-position: 90% 70%, 20% 30%, 70% 20%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-shimmer::after {
+    animation: none;
+  }
 }
 
 .card-row {
@@ -234,13 +294,15 @@ a { color: inherit; text-decoration: none; }
   background: var(--button-bg-hover);
 }
 
-/* Large size — PDP. Checked against the real button (Figma node 11:1362/
-   11:1366): font-size and horizontal padding scale up, but vertical padding
-   and tracking do not — it reuses the compact button-padding-y and the nav
-   type scale's tracking, not a "large" version of the compact ones. */
+/* Large size — PDP. Was matched to the real Figma button (node 11:1362/
+   11:1366: horizontal padding scaled up but vertical padding/tracking
+   reused the compact values, font-size jumped to the nav scale). Now
+   deliberately changed to match .cart-checkout-btn's proportions instead —
+   see the button.padding-y-large/font-size-large/tracking-large token
+   descriptions in tokens.json for the Figma delta this creates. */
 .btn-bag--large {
   height: auto;
-  padding: var(--button-padding-y) var(--button-padding-x-large);
+  padding: var(--button-padding-y-large) var(--button-padding-x-large);
   font-size: var(--button-font-size-large);
   letter-spacing: var(--button-tracking-large);
 }
@@ -380,6 +442,42 @@ a { color: inherit; text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .liquid-metal-spin {
+    animation: none;
+  }
+}
+
+/* ---------- Liquid metal — chrome variant (draft) ----------
+   Draft alternative to the organic drift above — components.html only for
+   now, not wired into any real page. Reads as polished metal rather than
+   liquid: a neutral gray base (the class alone can't turn the pink logo
+   fill metallic, so the demo wrapper overrides --nav-logo-fill inline —
+   see components.html) plus a hard-edged banded gradient sweeping in one
+   direction on a loop, like a specular highlight sliding across a metal
+   surface, instead of soft blobs wandering. Same mask/overlay scaffolding
+   (.liquid-metal, .liquid-metal--logo) as the original — only
+   .liquid-metal-spin's own background/animation is swapped out. */
+.liquid-metal--chrome .liquid-metal-spin {
+  background: repeating-linear-gradient(
+    115deg,
+    #3a3a3a 0%,
+    #3a3a3a 6%,
+    #cfcfcf 12%,
+    #ffffff 16%,
+    #cfcfcf 20%,
+    #3a3a3a 26%,
+    #3a3a3a 40%
+  );
+  background-size: 260% 260%;
+  animation: chrome-sweep 2.5s linear infinite;
+}
+
+@keyframes chrome-sweep {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-metal--chrome .liquid-metal-spin {
     animation: none;
   }
 }
@@ -851,6 +949,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   padding: var(--space-600) var(--space-500);
+  padding-top: var(--space-200); /* matches .site-header's vertical padding, so CART aligns with the SHOP/CART nav links */
 }
 
 /* Liquid glass variant — branch pages only (pdp-branch.html, index-branch.html
@@ -902,9 +1001,22 @@ a { color: inherit; text-decoration: none; }
 .cart-close {
   background: none;
   border: none;
-  font-size: var(--font-size-nav); /* was a hardcoded 22px — nearest existing token, pending a real Figma value */
+  padding: 0;
   color: var(--card-text-color);
-  line-height: 1;
+  cursor: pointer;
+}
+
+/* Thin X — a drawn stroke instead of the &times; glyph, so its weight is
+   set directly (1px, --border-width-thin) rather than left to whatever a
+   font renders — matches the color picker's selected-state ring, which
+   uses the same token for the same reason. */
+.cart-close svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--border-width-thin);
 }
 
 .cart-empty {
@@ -957,10 +1069,68 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.6;
 }
 
+/* Detailed row layout — Draft cart drawer (EmmetCartDrawer) only. The
+   live cart.js-driven drawer on Regular pages keeps the plain .cart-item
+   markup/styling above (single .cart-item-meta line, no qty row), so this
+   is scoped under .cart-item--detailed rather than changing those shared
+   rules directly. */
+.cart-item--detailed img {
+  width: 104px;
+  height: 104px;
+  border-radius: 0; /* overrides the shared .cart-item img radius — live cart.js thumbnails keep it, these don't */
+}
+
+.cart-item-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+}
+
+.cart-item-price {
+  font-family: var(--nav-font-family), sans-serif;
+  font-size: var(--font-size-product);
+  color: var(--card-text-color);
+}
+
+.cart-item-finish-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+  margin-top: var(--space-150);
+}
+
+.cart-item-finish {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: var(--font-size-product);
+  color: var(--card-text-color);
+}
+
+.cart-item-swatch {
+  width: var(--space-150);
+  height: var(--space-150);
+  border-radius: 50%;
+}
+
+.cart-item-swatch[data-finish="gold"] {
+  background: var(--picker-swatch-fill-gold);
+}
+
+.cart-item-swatch[data-finish="silver"] {
+  background: var(--picker-swatch-fill-silver);
+}
+
+.cart-qty-label {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: var(--font-size-product);
+  color: var(--card-text-color);
+  margin-right: var(--space-050); /* was --space-150 — extra gap beyond .cart-qty's own (now also tightened), so the label still reads apart from the stepper group */
+}
+
 .cart-qty {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-150);
+  gap: var(--space-050); /* was --space-150 — tighter row */
   margin-top: var(--space-150);
 }
 
@@ -971,8 +1141,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   justify-content: center;
   background: none;
-  border: var(--border-width-thin) solid var(--color-border-subtle);
-  border-radius: var(--radius-pill);
+  border: none; /* was a --border-width-thin circle — removed to make +/- less prominent */
   color: var(--card-text-color);
   font-size: var(--font-size-product); /* was a hardcoded 14px */
   line-height: 1;
@@ -1054,6 +1223,10 @@ a { color: inherit; text-decoration: none; }
 
   .site-header {
     padding: var(--space-150) var(--space-300);
+  }
+
+  .cart-drawer {
+    padding-top: var(--space-150); /* matches .site-header's mobile vertical padding */
   }
 
   .nav-link {
@@ -1205,7 +1378,7 @@ a { color: inherit; text-decoration: none; }
      later in the cascade, so it was winning and shrinking every "large"
      button (PDP, PDP branch) back down to compact size on mobile. */
   .btn-bag--large {
-    padding: var(--button-padding-y) var(--button-padding-x-large);
+    padding: var(--button-padding-y-large) var(--button-padding-x-large);
     font-size: var(--button-font-size-large);
   }
 

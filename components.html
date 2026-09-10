@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Emmett — Components</title>
 <link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
-<meta property="og:title" content="Emmett — Components">
-<meta property="og:image" content="https://eohworks.github.io/emmet/assets/logo.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://eohworks.github.io/emmet/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
@@ -101,6 +97,31 @@ fires: "add-to-bag" (bubbles, composed, detail: {name, finish, price, image})</p
 </div>
 
 <div class="gallery-section">
+  <h2>Logo Shimmer <span class="badge badge--draft">Draft</span></h2>
+  <p class="gallery-desc">Two shimmer treatments over the same logo mark. Current: soft radial highlights wandering slowly (<code>.liquid-metal-spin</code>), reading as liquid metal. Chrome (draft): a hard-edged banded gradient sweeping in one direction on a loop over a neutral gray fill, reading as polished metal instead — <code>.liquid-metal--chrome</code> swaps the spin layer's background/animation; the gray fill itself is an inline override on the demo wrapper below, since the pink logo fill would fight a true chrome look.</p>
+  <div class="swatch-grid">
+    <div>
+      <div class="swatch-label">Current (organic drift)</div>
+      <div class="swatch" style="background:#1e1752;">
+        <span style="position:relative; display:block; width:180px;">
+          <span class="site-logo-svg" id="logoDemoCurrent"></span>
+          <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+        </span>
+      </div>
+    </div>
+    <div>
+      <div class="swatch-label">Chrome (draft)</div>
+      <div class="swatch" style="background:#1e1752;">
+        <span style="position:relative; display:block; width:180px; --nav-logo-fill:#9a9a9a;">
+          <span class="site-logo-svg" id="logoDemoChrome"></span>
+          <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gallery-section">
   <h2>Navigation <span class="badge badge--draft">Draft</span></h2>
   <p class="gallery-desc">One variant, used identically on Home and PDP — transparent overlay floating over whatever's beneath it (hero image, product gallery, or the white details panel). Not yet swapped into either page's hand-written markup.</p>
   <p class="gallery-api">&lt;emmet-nav&gt;&lt;/emmet-nav&gt;
@@ -172,6 +193,11 @@ fires: "change" (bubbles, composed, detail: {value})</p>
   liveButton.addEventListener("add-to-bag", () => {
     liveButton.setAttribute("state", "added");
     setTimeout(() => liveButton.setAttribute("state", "default"), 1200);
+  });
+
+  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("logoDemoCurrent").innerHTML = svg;
+    document.getElementById("logoDemoChrome").innerHTML = svg;
   });
 
   document.getElementById("finishDemo").addEventListener("change", (e) => {

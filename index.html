@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Emmett</title>
 <link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
-<meta property="og:title" content="Emmett">
-<meta property="og:image" content="https://eohworks.github.io/emmet/assets/logo.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://eohworks.github.io/emmet/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
@@ -52,7 +48,7 @@
 <aside class="cart-drawer" id="cartDrawer">
   <div class="cart-drawer-head">
     <span class="cart-title">Cart</span>
-    <button class="cart-close" id="cartClose" aria-label="Close">&times;</button>
+    <button class="cart-close" id="cartClose" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 1L15 15M15 1L1 15"/></svg></button>
   </div>
   <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
   <div class="cart-items" id="cartItems" style="display:none"></div>
@@ -62,7 +58,7 @@
 <script src="products.js"></script>
 <script src="cart.js"></script>
 <script>
-  // Exact 12-slot structure sourced from the Figma file (2 spread + 4 grid + ticker + 4 grid + 2 spread).
+  // 2 spread (2-col) + 4 grid (4-col) + 2 spread (2-col) + 4 grid (4-col).
   const SECTIONS = [
     {
       type: "spread",
@@ -80,7 +76,13 @@
         { name: "Item Three", finish: "Gold", image: "assets/item-three-gold.png" },
       ],
     },
-    { type: "ticker" },
+    {
+      type: "spread",
+      cards: [
+        { name: "Item one", finish: "Silver", image: "assets/character-art.jpg", lifestyle: true },
+        { name: "Item Five", finish: "Gold", image: "assets/item-five-gold.png" },
+      ],
+    },
     {
       type: "grid",
       cards: [
@@ -88,13 +90,6 @@
         { name: "Item Four", finish: "Gold", image: "assets/item-four-gold.png" },
         { name: "Item One", finish: "Silver", image: "assets/item-one-silver.png" },
         { name: "Item One", finish: "Gold", image: "assets/item-one-gold.png" },
-      ],
-    },
-    {
-      type: "spread",
-      cards: [
-        { name: "Item one", finish: "Silver", image: "assets/character-art.jpg", lifestyle: true },
-        { name: "Item Five", finish: "Gold", image: "assets/item-five-gold.png" },
       ],
     },
   ];
@@ -108,26 +103,19 @@
       .join(" ");
     return `
       <a href="${href}" class="${classes}">
-        <div class="card-media"><img src="${card.image}" alt="${card.name}, ${card.finish} finish"></div>
+        <div class="card-media">
+          <img src="${card.image}" alt="${card.name}, ${card.finish} finish">
+          ${card.lifestyle ? "" : `<img class="card-media-hover" src="assets/lifestyle-necklace.jpg" alt="" aria-hidden="true">`}
+        </div>
+        ${card.lifestyle ? "" : '<span class="card-shimmer" aria-hidden="true"></span>'}
         <div class="card-row card-row--top">
           <p class="card-name">${card.name}</p>
           <p class="card-finish">${card.finish}</p>
         </div>
         <div class="card-row card-row--bottom">
           <p class="card-price">$675</p>
-          <button type="button" class="btn-bag">Add To Cart</button>
         </div>
       </a>
-    `;
-  }
-
-  function tickerHTML() {
-    const phrase = "Free shipping on orders above $100";
-    const repeats = Array(10).fill(`<span>${phrase}</span>`).join("");
-    return `
-      <div class="ticker">
-        <div class="ticker-track">${repeats}${repeats}</div>
-      </div>
     `;
   }
 
@@ -226,27 +214,9 @@
 
   const grid = document.getElementById("productGrid");
   grid.innerHTML = SECTIONS.map((section) => {
-    if (section.type === "ticker") return tickerHTML();
     const isSpread = section.type === "spread";
     return section.cards.map((c) => cardHTML(c, isSpread)).join("");
   }).join("");
-
-  const allCards = SECTIONS.filter((s) => s.type !== "ticker").flatMap((s) => s.cards);
-  grid.querySelectorAll(".product-card").forEach((cardEl, i) => {
-    const card = allCards[i];
-    const btn = cardEl.querySelector(".btn-bag");
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      Cart.add({ name: card.name, finish: card.finish, price: 675, image: card.image });
-      btn.textContent = "Added";
-      btn.classList.add("is-added");
-      setTimeout(() => {
-        btn.textContent = "Add To Cart";
-        btn.classList.remove("is-added");
-      }, 1200);
-    });
-  });
 </script>
 </body>
 </html>

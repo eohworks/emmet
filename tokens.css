@@ -41,6 +41,8 @@
   --font-family-body: Archivo;
   --font-size-100: 12px;
   --font-size-200: 14px;
+  --font-size-300: 18px;
+  --font-size-400: 22px;
   --font-size-500: 28px;
   --font-tracking-100: -0.24px;
   --font-tracking-200: -0.28px;
@@ -92,11 +94,11 @@
   --button-padding-x: var(--space-card-padding);
   --button-padding-y: var(--space-050);
   --button-padding-x-large: var(--space-500);
-  --button-padding-y-large: var(--space-150);
+  --button-padding-y-large: var(--space-300);
   --button-font-family: var(--font-family-heading);
   --button-font-size: var(--font-size-product);
-  --button-font-size-large: var(--font-size-nav);
-  --button-tracking-large: var(--font-tracking-nav);
+  --button-font-size-large: var(--font-size-product);
+  --button-tracking-large: var(--font-tracking-product);
   --card-bg: var(--color-surface-card);
   --card-border-color: var(--color-border-subtle);
   --card-border-width: var(--border-width-default);

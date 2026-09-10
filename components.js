@@ -197,7 +197,7 @@ class EmmetCartDrawer extends HTMLElement {
       <aside class="cart-drawer" data-drawer>
         <div class="cart-drawer-head">
           <span class="cart-title">Cart</span>
-          <button class="cart-close" type="button" data-close aria-label="Close">&times;</button>
+          <button class="cart-close" type="button" data-close aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 1L15 15M15 1L1 15"/></svg></button>
         </div>
         <p class="cart-empty" data-empty>Your cart is empty.</p>
         <div class="cart-items" data-items style="display:none"></div>
@@ -272,12 +272,19 @@ class EmmetCartDrawer extends HTMLElement {
     list.innerHTML = this._items
       .map(
         (it, i) => `
-      <div class="cart-item">
+      <div class="cart-item cart-item--detailed">
         <img src="${it.image}" alt="">
         <div class="cart-item-body">
-          <div class="cart-item-name">${it.name}</div>
-          <div class="cart-item-meta">${it.finish} · ${it.price}</div>
+          <div class="cart-item-top-row">
+            <span class="cart-item-name">${it.name}</span>
+            <span class="cart-item-price">${it.price}</span>
+          </div>
+          <div class="cart-item-finish-row">
+            <span class="cart-item-finish">${it.finish}</span>
+            <span class="cart-item-swatch" data-finish="${it.finish.toLowerCase()}"></span>
+          </div>
           <div class="cart-qty">
+            <span class="cart-qty-label">QTY</span>
             <button type="button" class="cart-qty-btn" data-qty-down="${i}" aria-label="${it.qty === 1 ? `Remove ${it.name}` : "Decrease quantity"}">&minus;</button>
             <span class="cart-qty-value">${it.qty}</span>
             <button type="button" class="cart-qty-btn" data-qty-up="${i}" aria-label="Increase quantity">+</button>
