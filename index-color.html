@@ -1,37 +1,30 @@
 <!doctype html>
-<html lang="en" data-theme="neutral">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Emmett — Home (Neutral)</title>
+<title>Emmett — Home (Color)</title>
 <link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="theme-neutral.css">
 <script src="nav-scroll.js" defer></script>
 </head>
 <body>
 
 <header class="site-header" data-reveal-zone="400">
-  <a href="index-neutral.html" class="nav-link">Shop</a>
+  <a href="index-color.html" class="nav-link">Shop</a>
   <a href="#" class="nav-link" id="cartLink">Cart</a>
 </header>
 
-<!-- --nav-logo-fill overridden locally to a mid-gray: the neutral theme
-     sets --color-accent-logo (and so --nav-logo-fill) to pure black, but
-     the chrome shimmer below is a mix-blend-mode:overlay effect — overlay
-     blended onto a black backdrop stays black, so the shimmer needs a
-     lighter base to actually show. Same gray used in the components.html
-     chrome draft. -->
-<a href="index-neutral.html" class="hero-logo" id="heroLogo" aria-label="Emmett home" style="--nav-logo-fill:#9a9a9a;">
+<a href="index-color.html" class="hero-logo" id="heroLogo" aria-label="Emmett home">
   <span class="hero-logo-svg" id="siteLogo"></span>
-  <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  <span class="liquid-metal liquid-metal--logo" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
 </a>
 
 <section class="hero">
-  <img src="assets/hero.jpg" alt="Five plush toy characters — the Emmett cast — standing side by side.">
+  <img src="assets/Drawing-pink.png" alt="Pink line-art illustration of an Emmett cast character.">
 </section>
 
 <main class="shop">
@@ -41,7 +34,7 @@
 <footer class="site-footer">
   <div class="footer-mark" aria-hidden="true">
     <span class="footer-mark-svg" id="footerMark"></span>
-    <span class="liquid-metal liquid-metal--symbol liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+    <span class="liquid-metal liquid-metal--symbol" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
   </div>
   <div class="footer-links">
     <a href="#" class="footer-link">Contact</a>
@@ -104,7 +97,7 @@
   function cardHTML(card, isSpread) {
     const item = card.name.replace(/^Item /i, "").toLowerCase();
     const finish = card.finish.toLowerCase() === "gold" ? "gold" : "silver";
-    const href = `pdp-neutral.html?item=${item}&finish=${finish}`;
+    const href = `pdp-color.html?item=${item}&finish=${finish}`;
     const classes = ["product-card", isSpread && "span-2", card.lifestyle && "product-card--lifestyle"]
       .filter(Boolean)
       .join(" ");
@@ -140,13 +133,28 @@
   // and shrinks/moves to the navbar's exact size/position over SCROLL_RANGE
   // px of scroll, then "sticks" there — the position:fixed element just
   // stops changing once progress clamps to 1, so nothing extra is needed
-  // to hold it in place for the rest of the scroll. Unlike index.html, this
-  // page does NOT also fade --nav-logo-fill on scroll — the grey-to-pink
-  // fade doesn't fit a neutral theme, and would fight the static gray this
-  // page sets so the chrome shimmer stays visible (see the inline style on
-  // #heroLogo above).
+  // to hold it in place for the rest of the scroll.
   const heroLogo = document.getElementById("heroLogo");
   const SCROLL_RANGE = 400; // keep in sync with .site-header's data-reveal-zone above (nav-scroll.js) — that's a static HTML attribute rather than set from here, since nav-scroll.js runs as a deferred script and can execute before this inline one sets any value.
+
+  // Logo color fade: starts greyscale (same value as the PDP color-picker's
+  // silver swatch, --color-material-silver) and fades to the logo's normal
+  // pink (--color-accent-logo) over the same progress that drives the
+  // size/position above — kept as plain RGB triples here (rather than
+  // reading the CSS vars) since interpolating a color frame-by-frame needs
+  // numeric components; --nav-logo-fill is only overridden on this one
+  // element, so the logo's normal pink elsewhere on the site is untouched.
+  const LOGO_COLOR_GREY = [217, 217, 217]; // --color-material-silver #D9D9D9
+  const LOGO_COLOR_PINK = [213, 17, 81]; // --color-accent-logo #D51151
+
+  function lerpLogoColor(t) {
+    const [r1, g1, b1] = LOGO_COLOR_GREY;
+    const [r2, g2, b2] = LOGO_COLOR_PINK;
+    const r = Math.round(r1 + (r2 - r1) * t);
+    const g = Math.round(g1 + (g2 - g1) * t);
+    const b = Math.round(b1 + (b2 - b1) * t);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
 
   function smallLogoWidth() {
     return window.matchMedia("(max-width: 768px)").matches ? 120 : 190;
@@ -179,6 +187,7 @@
 
     heroLogo.style.width = `${bigWidth + (smallWidth - bigWidth) * progress}px`;
     heroLogo.style.top = `${bigTop + (smallTop - bigTop) * progress}px`;
+    heroLogo.style.setProperty("--nav-logo-fill", lerpLogoColor(progress));
   }
 
   window.addEventListener("scroll", updateHeroLogo, { passive: true });
