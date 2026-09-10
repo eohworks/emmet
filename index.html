@@ -31,7 +31,8 @@
 </a>
 
 <section class="hero">
-  <img src="assets/hero.jpg" alt="Five plush toy characters — the Emmett cast — standing side by side.">
+  <img class="hero-image is-active" src="assets/Emmett_Group_Splash-web.jpg" alt="Two silver pendant necklaces on a wet, icy surface.">
+  <img class="hero-image" src="assets/Emmet%20hero.jpeg" alt="Close-up beauty portrait of a model wearing an Emmett pendant necklace.">
 </section>
 
 <main class="shop">
@@ -185,23 +186,39 @@
   window.addEventListener("resize", updateHeroLogo);
   updateHeroLogo();
 
-  // Hero image scale: the png grows from 100% to HERO_SCALE_MAX over the
-  // same SCROLL_RANGE as the logo animation above (so it settles in step
-  // with it), instead of the translate-based parallax this replaces —
-  // .hero's overflow:hidden clips the excess as it grows, no extra
-  // headroom/sizing tricks needed the way the old translate did.
-  const heroImg = document.querySelector(".hero img");
+  // Hero image scale: the png grows from 100% to HERO_SCALE_MAX over its
+  // own HERO_SCALE_RANGE, decoupled from the logo animation's SCROLL_RANGE
+  // above (was tied to it, reaching full zoom in step with the logo) —
+  // now longer, so the zoom progresses more slowly per pixel scrolled and
+  // reaches full size later than the logo settles. .hero's overflow:hidden
+  // clips the excess as it grows, no extra headroom/sizing tricks needed
+  // the way the old translate-based parallax this replaces did.
+  const heroImages = document.querySelectorAll(".hero img"); // was a single querySelector — now two images (the crossfade carousel below), both zoom together
   const HERO_SCALE_MAX = 1.5;
+  const HERO_SCALE_RANGE = 800; // was tied to SCROLL_RANGE (400) — doubled to slow the zoom down
 
   function updateHeroScale() {
-    const progress = Math.min(1, Math.max(0, window.scrollY / SCROLL_RANGE));
+    const progress = Math.min(1, Math.max(0, window.scrollY / HERO_SCALE_RANGE));
     const scale = 1 + (HERO_SCALE_MAX - 1) * progress;
-    heroImg.style.transform = `scale(${scale})`;
+    heroImages.forEach((img) => {
+      img.style.transform = `scale(${scale})`;
+    });
   }
 
   window.addEventListener("scroll", updateHeroScale, { passive: true });
   window.addEventListener("resize", updateHeroScale);
   updateHeroScale();
+
+  // Hero carousel: crosses over to the next image every 3000ms — the fade
+  // itself is a plain CSS opacity transition (.hero img, 1s) triggered by
+  // toggling .is-active, not a JS-driven animation, so this interval only
+  // needs to swap which image has the class.
+  let heroIndex = 0;
+  setInterval(() => {
+    heroImages[heroIndex].classList.remove("is-active");
+    heroIndex = (heroIndex + 1) % heroImages.length;
+    heroImages[heroIndex].classList.add("is-active");
+  }, 3000);
 
   const grid = document.getElementById("productGrid");
   grid.innerHTML = SECTIONS.map((section) => {

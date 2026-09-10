@@ -98,7 +98,7 @@ fires: "add-to-bag" (bubbles, composed, detail: {name, finish, price, image})</p
 
 <div class="gallery-section">
   <h2>Logo Shimmer <span class="badge badge--draft">Draft</span></h2>
-  <p class="gallery-desc">Two shimmer treatments over the same logo mark. Current: soft radial highlights wandering slowly (<code>.liquid-metal-spin</code>), reading as liquid metal. Chrome (draft): a hard-edged banded gradient sweeping in one direction on a loop over a neutral gray fill, reading as polished metal instead — <code>.liquid-metal--chrome</code> swaps the spin layer's background/animation; the gray fill itself is an inline override on the demo wrapper below, since the pink logo fill would fight a true chrome look.</p>
+  <p class="gallery-desc">Three shimmer treatments over the same logo mark. Current: soft radial highlights wandering slowly (<code>.liquid-metal-spin</code>), reading as liquid metal. Chrome (draft): a hard-edged banded gradient sweeping in one direction on a loop over a neutral gray fill, reading as polished metal instead — <code>.liquid-metal--chrome</code> swaps the spin layer's background/animation. Liquid (draft): blurred highlight/shadow blobs pushed through a steep contrast filter (the classic "gooey blob" trick) so they visibly pinch into one blob as they drift close, then split apart again — reads as droplets of mercury merging rather than light wandering over a fixed surface. Both drafts' gray fill is an inline override on the demo wrapper below, since the pink logo fill would fight a neutral-metal look.</p>
   <div class="swatch-grid">
     <div>
       <div class="swatch-label">Current (organic drift)</div>
@@ -115,6 +115,15 @@ fires: "add-to-bag" (bubbles, composed, detail: {name, finish, price, image})</p
         <span style="position:relative; display:block; width:180px; --nav-logo-fill:#9a9a9a;">
           <span class="site-logo-svg" id="logoDemoChrome"></span>
           <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+        </span>
+      </div>
+    </div>
+    <div>
+      <div class="swatch-label">Liquid (draft)</div>
+      <div class="swatch" style="background:#1e1752;">
+        <span style="position:relative; display:block; width:180px; --nav-logo-fill:#9a9a9a;">
+          <span class="site-logo-svg" id="logoDemoLiquid"></span>
+          <span class="liquid-metal liquid-metal--logo liquid-metal--liquid" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
         </span>
       </div>
     </div>
@@ -198,6 +207,7 @@ fires: "change" (bubbles, composed, detail: {value})</p>
   fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
     document.getElementById("logoDemoCurrent").innerHTML = svg;
     document.getElementById("logoDemoChrome").innerHTML = svg;
+    document.getElementById("logoDemoLiquid").innerHTML = svg;
   });
 
   document.getElementById("finishDemo").addEventListener("change", (e) => {
