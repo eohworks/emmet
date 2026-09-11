@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-theme="neutral">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emmett — Shop</title>
+<link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="theme-neutral.css">
+<script src="nav-scroll.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="plp.html" class="nav-link">Shop</a>
+  <!-- --nav-logo-fill overridden locally to a mid-gray — see index.html's
+       comment: the neutral theme's --color-accent-logo is pure black, and the
+       chrome shimmer's mix-blend-mode:overlay needs a lighter base to show. -->
+  <a href="index.html" class="site-logo" aria-label="Emmett home" style="--nav-logo-fill:#9a9a9a;">
+    <span class="site-logo-svg" id="siteLogo"></span>
+    <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </a>
+  <a href="#" class="nav-link" id="cartLink">Cart</a>
+</header>
+
+<main class="shop shop--plp">
+  <div class="product-grid" id="productGrid"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-mark" aria-hidden="true">
+    <span class="footer-mark-svg" id="footerMark"></span>
+    <span class="liquid-metal liquid-metal--symbol liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">About</a>
+    <a href="#" class="footer-link">Legal</a>
+    <a href="#" class="footer-link">Social</a>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head">
+    <span class="cart-title">Cart</span>
+    <button class="cart-close" id="cartClose" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 1L15 15M15 1L1 15"/></svg></button>
+  </div>
+  <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
+  <div class="cart-items" id="cartItems" style="display:none"></div>
+  <div class="cart-summary" id="cartSummary" style="display:none">
+    <span>Subtotal</span>
+    <span id="cartSubtotal"></span>
+  </div>
+  <button type="button" class="cart-checkout-btn" id="cartCheckoutBtn" style="display:none">Checkout</button>
+  <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
+</aside>
+
+<script src="products.js"></script>
+<script src="cart-neutral.js"></script>
+<script>
+  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("siteLogo").innerHTML = svg;
+  });
+  fetch("assets/svg/symbol.svg").then((r) => r.text()).then((svg) => {
+    document.getElementById("footerMark").innerHTML = svg;
+  });
+
+  // Mosaic grid sourced from Figma (node 95:146, "PLP layout") — Item Five
+  // in each finish is a 2x2 feature card, the other four items sit as plain
+  // 1x1 cells. DOM order + .product-card--feature's span (see styles.css)
+  // is enough for CSS Grid's own auto-placement to reproduce the exact
+  // mosaic; no explicit grid-line coordinates needed.
+  const LAYOUT = [
+    { item: "two", finish: "silver" },
+    { item: "three", finish: "silver" },
+    { item: "five", finish: "gold", feature: true },
+    { item: "four", finish: "silver", finishLabel: "§" }, // matches the Figma source file's own label for this cell verbatim, not a codebase typo
+    { item: "one", finish: "silver" },
+    { item: "five", finish: "silver", feature: true },
+    { item: "two", finish: "gold" },
+    { item: "three", finish: "gold" },
+    { item: "four", finish: "gold" },
+    { item: "one", finish: "gold" },
+  ];
+
+  function cardHTML(entry) {
+    const product = PRODUCTS[entry.item];
+    const finishLabel = entry.finishLabel || (entry.finish === "gold" ? "Gold" : "Silver");
+    const href = `pdp.html?item=${entry.item}&finish=${entry.finish}`;
+    const classes = ["product-card", entry.feature && "product-card--feature"].filter(Boolean).join(" ");
+    return `
+      <a href="${href}" class="${classes}">
+        <div class="card-media">
+          <img src="${product.images[entry.finish]}" alt="${product.name}, ${finishLabel} finish">
+          <img class="card-media-hover" src="assets/lifestyle-necklace.jpg" alt="" aria-hidden="true">
+        </div>
+        <div class="card-media-dots" aria-hidden="true"><span class="is-active"></span><span></span></div>
+        <span class="card-shimmer" aria-hidden="true"></span>
+        <div class="card-row card-row--top">
+          <p class="card-name">${product.name}</p>
+          <p class="card-finish">${finishLabel}</p>
+        </div>
+        <div class="card-row card-row--bottom">
+          <p class="card-price">$${product.price}</p>
+        </div>
+      </a>
+    `;
+  }
+
+  const grid = document.getElementById("productGrid");
+  grid.innerHTML = LAYOUT.map(cardHTML).join("");
+
+  // Mobile swipe carousel: .card-media becomes a horizontal scroll-snap
+  // container (see styles.css's (max-width: 768px) rules), so the dots
+  // just need to track its scrollLeft the same way .pdp-gallery's do on
+  // the PDP. Only fires from a real swipe, never on desktop where
+  // .card-media has no scrollable overflow.
+  document.querySelectorAll(".card-media").forEach((media) => {
+    const dots = media.nextElementSibling.querySelectorAll("span");
+    media.addEventListener(
+      "scroll",
+      () => {
+        const index = Math.round(media.scrollLeft / media.clientWidth);
+        dots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
+      },
+      { passive: true }
+    );
+  });
+</script>
+</body>
+</html>

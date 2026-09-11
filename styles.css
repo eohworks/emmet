@@ -4,6 +4,14 @@
 
 @import url("tokens.css");
 
+/* Hand-authored, not a Figma/tokens.json value — a layout constant so
+   .site-header's own height and any page that needs to clear it (it's
+   position:fixed) stay in sync from one source instead of two hardcoded
+   60px values drifting apart. */
+:root {
+  --header-height: 60px;
+}
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -34,7 +42,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   justify-content: space-between;
   padding: var(--space-200) var(--space-500);
-  min-height: 60px;
+  min-height: var(--header-height);
 }
 
 .nav-link {
@@ -134,6 +142,17 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
 }
 
+/* PLP only — .site-header is position:fixed (always overlaying page
+   content — see its own rule above). index.html's .shop sits below the
+   hero, which already clears the header on its own, but plp.html's grid is
+   the first thing on the page with no such buffer, so it needs real top
+   padding to clear the header itself — tied to --header-height (same var
+   .site-header's own min-height uses) rather than a hardcoded 60px, so the
+   two can't drift out of sync. */
+.shop--plp {
+  padding-top: calc(var(--header-height) + var(--space-500));
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -156,6 +175,16 @@ a { color: inherit; text-decoration: none; }
 
 .product-card.span-2 {
   grid-column: span 2;
+}
+
+/* PLP mosaic (Figma node 95:146) — a 2x2 "feature" cell for the two
+   larger Item Five cards. Doubling both axes keeps the 4:5 aspect-ratio
+   unchanged, so plain CSS Grid auto-placement (sparse, the default) lays
+   the whole mosaic out correctly on its own from DOM order alone — no
+   explicit grid-line coordinates needed, same as .span-2 above. */
+.product-card--feature {
+  grid-column: span 2;
+  grid-row: span 2;
 }
 
 /* Lifestyle variant — editorial/lifestyle photography instead of a plain
@@ -204,11 +233,35 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
-/* Both the lifestyle crossfade above and the shimmer below are desktop-only
-   for now (dropped on mobile rather than converted) — touch devices don't
-   have a real hover state, and some mobile browsers apply :hover on tap,
-   which would trigger these as an unintended side effect of the very tap
-   that navigates to the PDP. */
+/* Mobile only — dot indicators for the swipeable pack-shot/lifestyle
+   carousel (see the (max-width: 768px) rules further down). Same look as
+   .pdp-gallery-dots, but positioned bottom-right within the card itself
+   rather than bottom-center of a full-width gallery, since a ProductCard's
+   own name/finish/price row already occupies the bottom edge. Hidden by
+   default — only shown on mobile, where the swap from a single image to a
+   two-image carousel actually happens. */
+.card-media-dots {
+  display: none;
+}
+
+.card-media-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-navy-200);
+}
+
+.card-media-dots span.is-active {
+  background: var(--color-accent-brand);
+}
+
+/* The shimmer below is desktop-only (dropped on mobile rather than
+   converted) — touch devices don't have a real hover state, and some
+   mobile browsers apply :hover on tap, which would trigger it as an
+   unintended side effect of the very tap that navigates to the PDP. The
+   lifestyle crossfade above is also desktop-only for the same reason, but
+   is converted rather than dropped on mobile — see the (max-width: 768px)
+   rules further down, which turn it into a swipeable carousel instead. */
 
 /* Regular Index only — a hover-triggered shimmer over the card's image,
    same recipe as .liquid-metal/.liquid-metal-spin (multi-radial-gradient
@@ -381,7 +434,7 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   width: 100px;
   height: 99px;
-  margin: var(--space-600) 0 var(--space-300);
+  margin: var(--space-600) 0 var(--space-500); /* bottom gap to .footer-links was --space-300 (16px), too tight against the symbol */
 }
 
 .footer-mark-svg,
@@ -605,14 +658,13 @@ a { color: inherit; text-decoration: none; }
 .pdp-details {
   position: fixed;
   top: 0;
-  right: 0;
-  width: 50%;
+  right: calc(100% / 12); /* columns 8–11 of 12 — leaves column 12 as a right margin instead of sitting flush against the viewport edge */
+  width: calc(100% * 4 / 12); /* 4 columns wide (8 through 11 inclusive) */
   height: 100vh;
   overflow-y: auto; /* safety net if content ever exceeds viewport height, not the primary scroll mechanism */
   display: flex;
   flex-direction: column;
   justify-content: center; /* per the real Figma PDP: the info block sits exactly vertically centered in the panel (measured 471.9px top offset in a 1141px-tall panel — precisely (1141-197)/2), not top-pinned */
-  padding: 0 96px; /* 96px matches the real Figma inset (measured, not derived from the space scale) */
 }
 
 .pdp-top-row {
@@ -710,6 +762,99 @@ a { color: inherit; text-decoration: none; }
   color: var(--card-text-color);
   opacity: 0.45;
   margin-top: var(--space-600);
+}
+
+/* PDP Details/Shipping accordions — sit where the bare SKU line used to,
+   replacing its own margin-top with the group's border-top so the SKU
+   text (now inside "Details") doesn't need that spacing itself. Simple
+   single-open-or-not disclosure, no exclusivity between the two. */
+.pdp-accordions {
+  margin: calc(var(--space-600) + var(--space-300)) 0 var(--space-600); /* was margin-top only (--space-600), no bottom margin */
+  border-top: var(--card-border-width) solid var(--card-border-color);
+}
+
+.pdp-accordion {
+  border-bottom: var(--card-border-width) solid var(--card-border-color);
+}
+
+.pdp-accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-300) var(--space-150) var(--space-300) 0; /* right padding indents the +/- icon off the panel's edge */
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family-body), sans-serif;
+  font-size: var(--font-size-product);
+  letter-spacing: var(--font-tracking-product);
+  color: var(--card-text-color);
+}
+
+/* Plain "+" that flattens to "−" on open — two bars, the vertical one
+   scales away instead of a rotating cross, so it doesn't imply the
+   dismiss/close action a rotated X reads as (see .cart-close's own X). */
+.pdp-accordion-icon {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.pdp-accordion-icon::before,
+.pdp-accordion-icon::after {
+  content: "";
+  position: absolute;
+  background: var(--card-text-color);
+  transition: transform 0.2s ease;
+}
+
+.pdp-accordion-icon::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--border-width-thin);
+  transform: translateY(-50%);
+}
+
+.pdp-accordion-icon::after {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: var(--border-width-thin);
+  transform: translateX(-50%);
+}
+
+.pdp-accordion.is-open .pdp-accordion-icon::after {
+  transform: translateX(-50%) scaleY(0);
+}
+
+.pdp-accordion-panel {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+
+.pdp-accordion.is-open .pdp-accordion-panel {
+  max-height: 240px; /* generous cap — real content (SKU line, a sentence of shipping copy) never gets close to clipping */
+}
+
+.pdp-accordion-panel-inner {
+  padding-bottom: var(--space-300);
+}
+
+.pdp-accordion-panel-inner .pdp-sku {
+  margin-top: 0; /* was spacing itself off .pdp-bottom-row; now it's just the first thing in the panel */
+}
+
+.pdp-accordion-text {
+  font-family: var(--font-family-text), sans-serif;
+  font-size: var(--font-size-footer-link);
+  line-height: 1.6;
+  color: var(--card-text-color);
+  opacity: 0.85;
+  margin: 0;
 }
 
 /* ==========================================================================
@@ -1421,6 +1566,49 @@ a { color: inherit; text-decoration: none; }
   .card-finish,
   .card-price {
     font-size: var(--font-size-footer-link); /* was a hardcoded 12px */
+  }
+
+  /* ProductCard, mobile only: the desktop hover-crossfade between the
+     pack-shot and lifestyle image doesn't translate to touch (no real
+     hover state), so it becomes a genuine swipeable carousel instead —
+     same horizontal scroll-snap + dot-indicator recipe as .pdp-gallery's
+     own mobile carousel. .card-media stays position:absolute/inset:0 from
+     the base rule; this only adds the scrolling behavior inside it. */
+  .card-media {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .card-media::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Edge */
+  }
+
+  .card-media img {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+  }
+
+  /* Reset from the desktop hover-crossfade positioning — on mobile this is
+     a normal second slide in the flex row above, always visible, not an
+     absolutely-positioned overlay waiting on a hover it'll never get. */
+  .card-media-hover {
+    position: static;
+    opacity: 1;
+  }
+
+  .card-media-dots {
+    display: flex;
+    gap: var(--space-050);
+    position: absolute;
+    bottom: 20px; /* centers the 6px dots on .card-price's own text center (12px padding-bottom + half its 22px content height, minus half the dot height) */
+    right: var(--space-150);
+    z-index: 1;
   }
 
   .btn-bag {

@@ -28,6 +28,12 @@
   --color-accent-logo: var(--color-black);
   --color-surface-inverse: var(--color-black);
   --color-border-subtle: var(--color-gray-400);
+  --button-radius: var(--radius-none); /* was --radius-full (pill) — squared off to match the thumbnails' sharp corners elsewhere in this theme; affects .btn-bag (Add To Cart) and .cart-checkout-btn */
+  /* --button-bg-hover normally aliases --color-accent-brand, but this theme
+     already points --color-accent-brand at the same pure black as
+     --button-bg-default (--color-surface-inverse) — hover would be a no-op.
+     One step lighter on this theme's own white>black scale instead. */
+  --button-bg-hover: var(--color-gray-900);
 }
 
 /* PDP only: .site-header overlays both the gallery (dark, via

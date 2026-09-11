@@ -16,7 +16,7 @@
 
 <div class="pdp-shell">
   <header class="site-header">
-    <a href="index.html" class="nav-link">Shop</a>
+    <a href="plp.html" class="nav-link">Shop</a>
     <!-- --nav-logo-fill overridden locally to a mid-gray — see index.html's
          comment: the neutral theme's --color-accent-logo is pure black, and the
          chrome shimmer's mix-blend-mode:overlay needs a lighter base to show. -->
@@ -51,7 +51,30 @@
         <button type="button" class="btn-bag btn-bag--large" id="pdpAddBtn">Add To Cart</button>
       </div>
 
-      <p class="pdp-sku" id="pdpSku"></p>
+      <div class="pdp-accordions">
+        <div class="pdp-accordion">
+          <button type="button" class="pdp-accordion-trigger" aria-expanded="false" data-accordion-trigger>
+            Details
+            <span class="pdp-accordion-icon" aria-hidden="true"></span>
+          </button>
+          <div class="pdp-accordion-panel">
+            <div class="pdp-accordion-panel-inner">
+              <p class="pdp-sku" id="pdpSku"></p>
+            </div>
+          </div>
+        </div>
+        <div class="pdp-accordion">
+          <button type="button" class="pdp-accordion-trigger" aria-expanded="false" data-accordion-trigger>
+            Shipping
+            <span class="pdp-accordion-icon" aria-hidden="true"></span>
+          </button>
+          <div class="pdp-accordion-panel">
+            <div class="pdp-accordion-panel-inner">
+              <p class="pdp-accordion-text">Ships within 3–5 business days. Free returns within 30 days.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -77,11 +100,16 @@
   </div>
   <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
   <div class="cart-items" id="cartItems" style="display:none"></div>
+  <div class="cart-summary" id="cartSummary" style="display:none">
+    <span>Subtotal</span>
+    <span id="cartSubtotal"></span>
+  </div>
+  <button type="button" class="cart-checkout-btn" id="cartCheckoutBtn" style="display:none">Checkout</button>
   <p class="cart-note">Demo storefront — checkout is not connected to any payment or order system.</p>
 </aside>
 
 <script src="products.js"></script>
-<script src="cart.js"></script>
+<script src="cart-neutral.js"></script>
 <script src="components.js"></script>
 <script>
   fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
@@ -147,6 +175,18 @@
   });
 
   renderProduct();
+
+  // Details/Shipping accordions — independent, not exclusive (opening one
+  // doesn't close the other). max-height transition (see styles.css) needs
+  // no JS-measured height since the panels' real content is short and
+  // comfortably inside the fixed cap.
+  document.querySelectorAll("[data-accordion-trigger]").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const accordion = trigger.closest(".pdp-accordion");
+      const isOpen = accordion.classList.toggle("is-open");
+      trigger.setAttribute("aria-expanded", String(isOpen));
+    });
+  });
 </script>
 </body>
 </html>
