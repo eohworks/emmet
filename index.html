@@ -118,7 +118,7 @@
       <a href="${href}" class="${classes}">
         <div class="card-media">
           <img src="${card.image}" alt="${card.name}, ${card.finish} finish">
-          ${card.lifestyle ? "" : `<img class="card-media-hover" src="assets/lifestyle-necklace.jpg" alt="" aria-hidden="true">`}
+          ${card.lifestyle ? "" : `<span class="card-media-hover-wrap"><img class="card-media-hover" src="assets/${finish === "gold" ? "Gold_dice" : "Silver_Tounge"}.jpg" alt="" aria-hidden="true"></span>`}
         </div>
         ${card.lifestyle ? "" : '<span class="card-shimmer" aria-hidden="true"></span>'}
         <div class="card-row card-row--top">

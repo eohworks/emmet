@@ -96,7 +96,7 @@
       <a href="${href}" class="${classes}">
         <div class="card-media">
           <img src="${product.images[entry.finish]}" alt="${product.name}, ${finishLabel} finish">
-          <img class="card-media-hover" src="assets/lifestyle-necklace.jpg" alt="" aria-hidden="true">
+          <span class="card-media-hover-wrap"><img class="card-media-hover" src="assets/${entry.finish === "gold" ? "Gold_dice" : "Silver_Tounge"}.jpg" alt="" aria-hidden="true"></span>
         </div>
         <div class="card-media-dots" aria-hidden="true"><span class="is-active"></span><span></span></div>
         <span class="card-shimmer" aria-hidden="true"></span>

@@ -214,21 +214,56 @@ a { color: inherit; text-decoration: none; }
   object-fit: cover;
 }
 
-/* Regular Index, desktop only — crosses over to a lifestyle/model photo on
-   hover instead of the plain pack-shot. Reuses one generic lifestyle image
-   for every card for now (no per-product on-model photography exists yet);
-   swap the src in index.html's cardHTML() once real per-item shots exist.
-   Sits in normal DOM order right after the pack-shot img, so it paints on
-   top within .card-media's own stacking context without needing z-index. */
-.card-media-hover {
+/* Regular Index/PLP, desktop only — crosses over to a lifestyle/model photo
+   on hover instead of the plain pack-shot (one shared shot per finish, set
+   in index.html/plp.html's cardHTML()). Sits in normal DOM order right
+   after the pack-shot img, so it paints on top within .card-media's own
+   stacking context without needing z-index.
+
+   .card-media-hover-wrap is a plain positioning/clipping box; the actual
+   <img class="card-media-hover"> lives inside it. Split into two elements
+   specifically so the zoom rule below can transform:scale() the img alone
+   — the wrap's own overflow:hidden then clips that scaled image to the
+   wrap's UNSCALED box. Without this split, a transform on the img directly
+   still gets visually clipped fine on desktop (.product-card's own
+   overflow:hidden catches it), but on the mobile swipe carousel further
+   down .card-media's overflow-x:auto counts the scaled image's ink
+   overflow as real scrollable content, adding dead space past the last
+   slide — verified via scrollWidth (466px instead of the expected 374px
+   for two 187px slides) before this wrap was introduced. */
+.card-media-hover-wrap {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
+/* Inherits width/height/object-fit:cover from .card-media img above — cover
+   crops automatically to fill the wrap's 4:5 frame no matter the source
+   image's own aspect ratio, centered by default. To pick which part of the
+   image survives that crop, set --card-media-hover-position inline on the
+   specific <img class="card-media-hover">, e.g.
+   style="--card-media-hover-position: top" or "20% 0%" (any object-position
+   value) — no CSS edit needed per image. */
+.card-media-hover {
+  display: block;
+  object-position: var(--card-media-hover-position, center);
+}
+
+/* "Small" ProductCards only — excludes Index's wider .span-2 spread cards
+   and PLP's 2x2 .product-card--feature mosaic cards. Zooms the hover image
+   in 2x, anchored to the bottom edge (transform-origin) so the extra scale
+   grows upward and crops away more of the top instead of cropping evenly
+   from the center. Same rule (no media query) covers both the desktop
+   hover crossfade and the mobile swipe-carousel slide further down. */
+.product-card:not(.span-2):not(.product-card--feature) .card-media-hover {
+  transform: scale(2);
+  transform-origin: 50% 100%;
+}
+
 @media (min-width: 769px) {
-  .product-card:hover .card-media-hover {
+  .product-card:hover .card-media-hover-wrap {
     opacity: 1;
   }
 }
@@ -247,12 +282,12 @@ a { color: inherit; text-decoration: none; }
 .card-media-dots span {
   width: 6px;
   height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--color-navy-200);
+  border-radius: var(--radius-full);
+  background: var(--carousel-dot-inactive);
 }
 
 .card-media-dots span.is-active {
-  background: var(--color-accent-brand);
+  background: var(--carousel-dot-active);
 }
 
 /* The shimmer below is desktop-only (dropped on mobile rather than
@@ -647,12 +682,12 @@ a { color: inherit; text-decoration: none; }
 .pdp-gallery-dots span {
   width: 6px;
   height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--color-navy-200); /* was --color-navy-900-a50 */
+  border-radius: var(--radius-full);
+  background: var(--carousel-dot-inactive); /* was --color-navy-200 direct, itself standing in for --color-navy-900-a50 */
 }
 
 .pdp-gallery-dots span.is-active {
-  background: var(--color-accent-brand);
+  background: var(--carousel-dot-active);
 }
 
 .pdp-details {
@@ -697,8 +732,8 @@ a { color: inherit; text-decoration: none; }
 .color-picker-swatch-wrap {
   display: inline-flex;
   padding: var(--space-050); /* gap between the swatch circle and its selection ring — tightened from --button-padding-x per explicit request */
-  border-radius: var(--radius-pill);
-  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--radius-full);
+  border: var(--border-width-default) solid transparent;
   background: none;
   cursor: pointer;
 }
@@ -814,7 +849,7 @@ a { color: inherit; text-decoration: none; }
   top: 50%;
   left: 0;
   width: 100%;
-  height: var(--border-width-thin);
+  height: var(--border-width-default);
   transform: translateY(-50%);
 }
 
@@ -822,7 +857,7 @@ a { color: inherit; text-decoration: none; }
   left: 50%;
   top: 0;
   height: 100%;
-  width: var(--border-width-thin);
+  width: var(--border-width-default);
   transform: translateX(-50%);
 }
 
@@ -883,7 +918,7 @@ a { color: inherit; text-decoration: none; }
    in a 6-column span (columns 4–9) instead of running full-bleed; the
    lifestyle image below it stays full-width (spans all 12). */
 .pdp-branch-gallery {
-  background: var(--color-navy-900);
+  background: var(--color-surface-inverse); /* was --color-navy-900 direct — same bug .pdp-gallery had before its own fix */
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 }
@@ -962,7 +997,7 @@ a { color: inherit; text-decoration: none; }
 .pdp-branch-more-images {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  background: var(--color-navy-900);
+  background: var(--color-surface-inverse); /* was --color-navy-900 direct */
 }
 
 .pdp-branch-more-images img {
@@ -1216,7 +1251,7 @@ a { color: inherit; text-decoration: none; }
   height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: var(--border-width-thin);
+  stroke-width: var(--border-width-default);
 }
 
 .cart-empty {
@@ -1239,7 +1274,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   gap: var(--space-200);
   align-items: flex-start; /* was center — top-aligned now that the body is 3 stacked rows (name+remove, meta, qty), not a single line */
-  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+  border-bottom: var(--border-width-default) solid var(--cart-divider-color);
   padding-bottom: var(--space-300);
 }
 
@@ -1248,7 +1283,7 @@ a { color: inherit; text-decoration: none; }
   height: 56px;
   object-fit: cover;
   background: var(--card-bg);
-  border-radius: var(--radius-md);
+  border-radius: var(--cart-item-image-radius);
 }
 
 .cart-item-body {
@@ -1362,7 +1397,7 @@ a { color: inherit; text-decoration: none; }
   justify-content: space-between;
   margin-top: var(--space-300);
   padding-top: var(--space-300);
-  border-top: var(--border-width-thin) solid var(--color-gray-200);
+  border-top: var(--border-width-default) solid var(--cart-divider-color);
   font-family: var(--nav-font-family), sans-serif;
   font-size: var(--price-font-size);
   letter-spacing: var(--font-tracking-product);
@@ -1400,7 +1435,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .btn-bag.is-added {
-  background: var(--color-accent-brand);
+  background: var(--button-bg-added); /* was --color-accent-brand direct — the component tier already had a token for exactly this state, just never wired up */
 }
 
 /* ==========================================================================
@@ -1587,17 +1622,21 @@ a { color: inherit; text-decoration: none; }
     display: none; /* Chrome/Safari/Edge */
   }
 
-  .card-media img {
+  .card-media > img,
+  .card-media > .card-media-hover-wrap {
     flex: 0 0 100%;
     width: 100%;
     height: 100%;
     scroll-snap-align: start;
   }
 
-  /* Reset from the desktop hover-crossfade positioning — on mobile this is
-     a normal second slide in the flex row above, always visible, not an
-     absolutely-positioned overlay waiting on a hover it'll never get. */
-  .card-media-hover {
+  /* Reset from the desktop hover-crossfade positioning — on mobile this
+     wrap is a normal second slide in the flex row above, always visible,
+     not an absolutely-positioned overlay waiting on a hover it'll never
+     get. It keeps its own overflow:hidden (still needed to clip the zoomed
+     img inside it — see that rule's comment) even though it's no longer
+     the thing being absolutely positioned. */
+  .card-media-hover-wrap {
     position: static;
     opacity: 1;
   }

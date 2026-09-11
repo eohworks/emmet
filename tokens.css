@@ -69,6 +69,8 @@
   --color-surface-card: var(--color-gray-100);
   --color-surface-inverse: var(--color-navy-900);
   --color-border-subtle: var(--color-navy-900-a50);
+  --color-border-divider: var(--color-gray-200);
+  --color-indicator-inactive: var(--color-navy-200);
   --color-finish-gold: var(--color-material-gold);
   --color-finish-silver: var(--color-material-silver);
   --font-family-heading: var(--font-family-display);
@@ -80,8 +82,8 @@
   --font-tracking-product: var(--font-tracking-200);
   --font-tracking-footer-link: var(--font-tracking-100);
   --radius-full: var(--radius-pill);
+  --radius-default: var(--radius-md);
   --space-card-padding: var(--space-200);
-  --space-section-padding: var(--space-600);
   --space-inline-gap: var(--space-500);
   --border-width-default: var(--border-width-thin);
 
@@ -120,4 +122,8 @@
   --price-font-size: var(--font-size-product);
   --picker-swatch-fill-gold: var(--color-finish-gold);
   --picker-swatch-fill-silver: var(--color-finish-silver);
+  --cart-divider-color: var(--color-border-divider);
+  --cart-item-image-radius: var(--radius-default);
+  --carousel-dot-inactive: var(--color-indicator-inactive);
+  --carousel-dot-active: var(--color-accent-brand);
 }
