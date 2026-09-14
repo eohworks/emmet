@@ -136,14 +136,6 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform-origin: center center; /* scroll-driven scale-up (index.html's updateHeroScale) grows from the center; .hero's overflow:hidden clips the excess */
-  will-change: transform, opacity;
-  opacity: 0;
-  transition: opacity 1s ease; /* the crossfade itself — index.html's carousel toggles .is-active every 3000ms, this is what makes that a smooth fade instead of a hard cut */
-}
-
-.hero img.is-active {
-  opacity: 1;
 }
 
 /* ---------- Shop grid ---------- */
@@ -210,6 +202,26 @@ a { color: inherit; text-decoration: none; }
 .product-card--lifestyle .card-row {
   opacity: 0;
   pointer-events: none;
+}
+
+/* .card-name/.card-finish/.card-price each set their own color directly
+   (see that shared rule above), so overriding it has to target them by
+   name too — a color set on the .card-row parent alone would never reach
+   them. White in the neutral theme — legible against the photo, same
+   token regular ProductCards use for their own hover-over-photo text. */
+.product-card--lifestyle .card-name,
+.product-card--lifestyle .card-finish,
+.product-card--lifestyle .card-price {
+  color: var(--card-text-color-hover);
+}
+
+/* Desktop: name/finish/price reveal on hover, matching the plain-crop
+   card's own :hover text — mobile has no hover state, so it just stays on
+   (see the (max-width: 768px) rules further down). */
+@media (min-width: 769px) {
+  .product-card--lifestyle:hover .card-row {
+    opacity: 1;
+  }
 }
 
 .card-media {
@@ -423,10 +435,14 @@ a { color: inherit; text-decoration: none; }
 
 /* Product Card hover — all card text (name, finish, price) shares one
    component-tier color token, card.text-color(-hover), rather than price
-   having its own separate token for a color it never actually diverges on. */
-.product-card:hover .card-name,
-.product-card:hover .card-finish,
-.product-card:hover .card-price {
+   having its own separate token for a color it never actually diverges on.
+   Excludes the large cards (.span-2 spread cards, .product-card--feature
+   mosaic cards) — they no longer show the lifestyle-photo hover crossfade
+   this white was meant to stay legible against (see that rule's own
+   comment), so their text stays black on hover too. */
+.product-card:not(.span-2):not(.product-card--feature):hover .card-name,
+.product-card:not(.span-2):not(.product-card--feature):hover .card-finish,
+.product-card:not(.span-2):not(.product-card--feature):hover .card-price {
   color: var(--card-text-color-hover);
 }
 
@@ -680,6 +696,23 @@ a { color: inherit; text-decoration: none; }
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Secondary/lifestyle slide only — same 2x, bottom-anchored zoom crop as
+   ProductCard's hover crossfade (.card-media-hover), for visual
+   consistency between the two places this same photo shows up. The wrap
+   is a plain overflow:hidden box (unlike .card-media-hover-wrap, no
+   absolute positioning or opacity/hover-triggered fade needed here — this
+   slide is always visible, just one of several stacked/carousel images)
+   that clips the scaled image back down to its own unscaled footprint. */
+.pdp-secondary-wrap {
+  display: block;
+  overflow: hidden;
+}
+
+#pdpSecondaryImage {
+  transform: scale(2);
+  transform-origin: 50% 100%;
 }
 
 /* Carousel dot indicators — only relevant/shown on mobile (see media query).
@@ -1520,6 +1553,23 @@ a { color: inherit; text-decoration: none; }
     scroll-snap-align: start;
   }
 
+  /* .pdp-secondary-wrap, not #pdpSecondaryImage itself, is the direct
+     .pdp-gallery child now — flex/scroll-snap-align only take effect on an
+     actual flex item, so the wrap needs its own copy of the slide sizing
+     the rule above already gives the other two (plain) <img> slides. */
+  .pdp-secondary-wrap {
+    flex: 0 0 100%;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    scroll-snap-align: start;
+  }
+
+  #pdpSecondaryImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   /* Overlaid on the image frame instead of stacked below it — a sibling of
      .pdp-gallery (the actual horizontally-scrolling element) within the
      positioned .pdp-gallery-frame, so the dots stay put at the bottom of
@@ -1611,6 +1661,12 @@ a { color: inherit; text-decoration: none; }
   .card-finish,
   .card-price {
     font-size: var(--font-size-footer-link); /* was a hardcoded 12px */
+  }
+
+  /* Lifestyle variant, mobile only: no hover state to reveal the text on,
+     so it just stays visible all the time instead. */
+  .product-card--lifestyle .card-row {
+    opacity: 1;
   }
 
   /* ProductCard, mobile only: the desktop hover-crossfade between the

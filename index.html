@@ -31,8 +31,7 @@
 </a>
 
 <section class="hero">
-  <img class="hero-image is-active" src="assets/hero_draft.jpeg" alt="Three gold pendant necklaces laid out on a reflective surface.">
-  <img class="hero-image" src="assets/hero_draft_2.jpeg" alt="Three gold pendant necklaces laid out on a reflective surface, with motion blur.">
+  <img class="hero-image" src="assets/hero_draft.jpeg" alt="Three gold pendant necklaces laid out on a reflective surface.">
 </section>
 
 <main class="shop">
@@ -77,7 +76,7 @@
       type: "spread",
       cards: [
         { name: "Item Five", finish: "Silver", image: "assets/item-five-silver.png" },
-        { name: "Item Five", finish: "Silver", image: "assets/E_5_Silver_secondary.jpg", lifestyle: true },
+        { name: "Item Five", finish: "Silver", image: "assets/e-5-silver-secondary.jpg", lifestyle: true },
       ],
     },
     {
@@ -92,7 +91,7 @@
     {
       type: "spread",
       cards: [
-        { name: "Item Two", finish: "Gold", image: "assets/E_2_Gold_secondary.jpg", lifestyle: true },
+        { name: "Item Two", finish: "Gold", image: "assets/e-2-gold-secondary.jpg", lifestyle: true },
         { name: "Item Five", finish: "Gold", image: "assets/item-five-gold.png" },
       ],
     },
@@ -114,11 +113,15 @@
     const classes = ["product-card", isSpread && "span-2", card.lifestyle && "product-card--lifestyle"]
       .filter(Boolean)
       .join(" ");
+    const product = PRODUCTS[item];
+    // Large (span-2) cards keep the shimmer but drop the hover-crossfade —
+    // per explicit request, only the compact 1x1 cards get it.
+    const secondarySrc = !card.lifestyle && !isSpread && product.images.secondary && product.images.secondary[finish];
     return `
       <a href="${href}" class="${classes}">
         <div class="card-media">
           <img src="${card.image}" alt="${card.name}, ${card.finish} finish">
-          ${card.lifestyle ? "" : `<span class="card-media-hover-wrap"><img class="card-media-hover" src="assets/${finish === "gold" ? "Gold_dice" : "Silver_Tounge"}.jpg" alt="" aria-hidden="true"></span>`}
+          ${secondarySrc ? `<span class="card-media-hover-wrap"><img class="card-media-hover" src="${secondarySrc}" alt="" aria-hidden="true"></span>` : ""}
         </div>
         ${card.lifestyle ? "" : '<span class="card-shimmer" aria-hidden="true"></span>'}
         <div class="card-row card-row--top">
@@ -181,40 +184,6 @@
   window.addEventListener("scroll", updateHeroLogo, { passive: true });
   window.addEventListener("resize", updateHeroLogo);
   updateHeroLogo();
-
-  // Hero image scale: the png grows from 100% to HERO_SCALE_MAX over its
-  // own HERO_SCALE_RANGE, decoupled from the logo animation's SCROLL_RANGE
-  // above (was tied to it, reaching full zoom in step with the logo) —
-  // now longer, so the zoom progresses more slowly per pixel scrolled and
-  // reaches full size later than the logo settles. .hero's overflow:hidden
-  // clips the excess as it grows, no extra headroom/sizing tricks needed
-  // the way the old translate-based parallax this replaces did.
-  const heroImages = document.querySelectorAll(".hero img"); // was a single querySelector — now two images (the crossfade carousel below), both zoom together
-  const HERO_SCALE_MAX = 1.5;
-  const HERO_SCALE_RANGE = 800; // was tied to SCROLL_RANGE (400) — doubled to slow the zoom down
-
-  function updateHeroScale() {
-    const progress = Math.min(1, Math.max(0, window.scrollY / HERO_SCALE_RANGE));
-    const scale = 1 + (HERO_SCALE_MAX - 1) * progress;
-    heroImages.forEach((img) => {
-      img.style.transform = `scale(${scale})`;
-    });
-  }
-
-  window.addEventListener("scroll", updateHeroScale, { passive: true });
-  window.addEventListener("resize", updateHeroScale);
-  updateHeroScale();
-
-  // Hero carousel: crosses over to the next image every 3000ms — the fade
-  // itself is a plain CSS opacity transition (.hero img, 1s) triggered by
-  // toggling .is-active, not a JS-driven animation, so this interval only
-  // needs to swap which image has the class.
-  let heroIndex = 0;
-  setInterval(() => {
-    heroImages[heroIndex].classList.remove("is-active");
-    heroIndex = (heroIndex + 1) % heroImages.length;
-    heroImages[heroIndex].classList.add("is-active");
-  }, 3000);
 
   const grid = document.getElementById("productGrid");
   grid.innerHTML = SECTIONS.map((section) => {

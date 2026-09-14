@@ -31,12 +31,10 @@
     <div class="pdp-gallery-frame">
       <div class="pdp-gallery" id="pdpGallery">
         <img id="pdpMainImage" src="" alt="">
-        <img src="assets/character-art.jpg" alt="Emmett necklace, lifestyle photo">
+        <span class="pdp-secondary-wrap" id="pdpSecondaryWrap"><img id="pdpSecondaryImage" src="" alt=""></span>
+        <img id="pdpIllustration" src="" alt="">
       </div>
-      <div class="pdp-gallery-dots" id="pdpGalleryDots">
-        <span class="is-active"></span>
-        <span></span>
-      </div>
+      <div class="pdp-gallery-dots" id="pdpGalleryDots"></div>
     </div>
 
     <div class="pdp-details">
@@ -131,7 +129,18 @@
   const skuEl = document.getElementById("pdpSku");
   const colorPicker = document.getElementById("colorPicker");
   const mainImage = document.getElementById("pdpMainImage");
+  const secondaryWrap = document.getElementById("pdpSecondaryWrap");
+  const secondaryImage = document.getElementById("pdpSecondaryImage");
   const pdpGallery = document.getElementById("pdpGallery");
+  const illustrationImage = document.getElementById("pdpIllustration");
+
+  // Finish-independent (same artwork for gold or silver), so it's set once
+  // here rather than inside renderProduct() — and always last in the
+  // gallery/mobile carousel, after the pack-shot and (if this finish has
+  // one) the secondary lifestyle shot.
+  illustrationImage.src = product.illustration;
+  illustrationImage.alt = `${product.name}, illustration`;
+  const galleryDotsWrap = document.getElementById("pdpGalleryDots");
 
   function renderProduct() {
     nameEl.textContent = `${product.name} (${product.sku})`;
@@ -141,21 +150,42 @@
     colorPicker.setAttribute("value", finish);
     mainImage.src = product.images[finish];
     mainImage.alt = `${product.name}, ${finish} finish`;
+
+    // Secondary/editorial shot is optional per finish (see products.js) —
+    // when this finish doesn't have one, that slide (and its dot) is
+    // dropped rather than shown blank.
+    const secondarySrc = product.images.secondary && product.images.secondary[finish];
+    secondaryWrap.style.display = secondarySrc ? "" : "none";
+    if (secondarySrc) {
+      secondaryImage.src = secondarySrc;
+      secondaryImage.alt = `${product.name}, ${finish} finish, lifestyle photo`;
+    }
+
+    // Dots are rebuilt from scratch each render (not just re-toggled) since
+    // the slide count itself changes with finish — 2 slides (main,
+    // illustration) or 3 (main, secondary, illustration). Index-matched
+    // 1:1 with the currently-visible <img> elements in pdpGallery.
+    const slideCount = secondarySrc ? 3 : 2;
+    galleryDotsWrap.innerHTML = Array.from({ length: slideCount })
+      .map((_, i) => `<span class="${i === 0 ? "is-active" : ""}"></span>`)
+      .join("");
+    galleryDotsWrap.querySelectorAll("span").forEach((dot, i) => {
+      dot.addEventListener("click", () => {
+        pdpGallery.scrollTo({ left: i * pdpGallery.clientWidth, behavior: "smooth" });
+      });
+    });
+
     pdpGallery.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }
 
   // Dot indicators only matter for the mobile carousel (horizontal snap-scroll);
   // on desktop the gallery scrolls vertically and scrollLeft stays 0, so this
-  // stays harmlessly inert there.
-  const galleryDots = document.querySelectorAll("#pdpGalleryDots span");
+  // stays harmlessly inert there. Dots are re-queried live (not captured
+  // once) since renderProduct() rebuilds them on every finish change.
   pdpGallery.addEventListener("scroll", () => {
+    const dots = galleryDotsWrap.querySelectorAll("span");
     const index = Math.round(pdpGallery.scrollLeft / pdpGallery.clientWidth);
-    galleryDots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
-  });
-  galleryDots.forEach((dot, i) => {
-    dot.addEventListener("click", () => {
-      pdpGallery.scrollTo({ left: i * pdpGallery.clientWidth, behavior: "smooth" });
-    });
+    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
   });
 
   colorPicker.addEventListener("change", (e) => {

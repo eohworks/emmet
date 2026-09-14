@@ -92,13 +92,17 @@
     const finishLabel = entry.finishLabel || (entry.finish === "gold" ? "Gold" : "Silver");
     const href = `pdp.html?item=${entry.item}&finish=${entry.finish}`;
     const classes = ["product-card", entry.feature && "product-card--feature"].filter(Boolean).join(" ");
+    // Large (2x2 feature) cards keep the shimmer but drop the hover-crossfade
+    // and its swipe-carousel dots — per explicit request, only the compact
+    // 1x1 cards get it.
+    const secondarySrc = !entry.feature && product.images.secondary && product.images.secondary[entry.finish];
     return `
       <a href="${href}" class="${classes}">
         <div class="card-media">
           <img src="${product.images[entry.finish]}" alt="${product.name}, ${finishLabel} finish">
-          <span class="card-media-hover-wrap"><img class="card-media-hover" src="assets/${entry.finish === "gold" ? "Gold_dice" : "Silver_Tounge"}.jpg" alt="" aria-hidden="true"></span>
+          ${secondarySrc ? `<span class="card-media-hover-wrap"><img class="card-media-hover" src="${secondarySrc}" alt="" aria-hidden="true"></span>` : ""}
         </div>
-        <div class="card-media-dots" aria-hidden="true"><span class="is-active"></span><span></span></div>
+        ${secondarySrc ? '<div class="card-media-dots" aria-hidden="true"><span class="is-active"></span><span></span></div>' : ""}
         <span class="card-shimmer" aria-hidden="true"></span>
         <div class="card-row card-row--top">
           <p class="card-name">${product.name}</p>
