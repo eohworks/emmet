@@ -166,6 +166,7 @@
   const addBtn = document.getElementById("pdpAddBtn");
   addBtn.addEventListener("click", () => {
     Cart.add({ name: product.name, finish, price: product.price, image: product.images[finish] });
+    Cart.open();
     addBtn.textContent = "Added";
     addBtn.classList.add("is-added");
     setTimeout(() => {

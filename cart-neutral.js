@@ -13,6 +13,12 @@ const Cart = (() => {
   let items = []; // each: {name, finish, price, image, qty}
 
   function render() {
+    const cartLink = document.getElementById("cartLink");
+    if (cartLink) {
+      const count = items.reduce((sum, it) => sum + it.qty, 0);
+      cartLink.innerHTML = count > 0 ? `Cart<span class="cart-count">(${count})</span>` : "Cart";
+    }
+
     const list = document.getElementById("cartItems");
     const empty = document.getElementById("cartEmpty");
     const summary = document.getElementById("cartSummary");

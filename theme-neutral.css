@@ -71,7 +71,8 @@
   mix-blend-mode: difference;
 }
 
-/* Footer: a lighter gray than the theme's pure-black --color-surface-inverse,
+/* Footer: a dark gray-900 background (distinct from the theme's pure-black
+   --color-surface-inverse) with white link text for contrast against it,
    plus the brand symbol gets the chrome shimmer (same treatment as the nav
    logo) instead of the default organic drift. --footer-mark-fill is
    overridden to a mid-gray for the same reason as --nav-logo-fill above —
@@ -79,7 +80,8 @@
    The .liquid-metal--chrome class itself is added in each page's markup
    (index-neutral.html, pdp-neutral.html), same as the nav logo. */
 [data-theme="neutral"] .site-footer {
-  --footer-bg: var(--color-gray-300);
+  --footer-bg: var(--color-gray-900);
+  --footer-link-color: var(--color-white);
 }
 
 [data-theme="neutral"] .footer-mark {

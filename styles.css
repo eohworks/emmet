@@ -57,6 +57,16 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
+/* Cart item-count suffix — "CART(1)" — set by cart-neutral.js's render().
+   Desktop only, per explicit request; on mobile .nav-link already drops to
+   --font-size-product (14px, the same value as --font-size-200 here), so
+   the count naturally inherits that instead of needing its own rule. */
+@media (min-width: 769px) {
+  .cart-count {
+    font-size: var(--font-size-200);
+  }
+}
+
 /* Logo stays fixed and always visible; only Shop/Cart hide on scroll-down
    and reappear on scroll-up (toggled via nav-scroll.js). */
 .site-header.nav-links-hidden .nav-link {
