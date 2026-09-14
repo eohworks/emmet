@@ -698,23 +698,6 @@ a { color: inherit; text-decoration: none; }
   height: auto;
 }
 
-/* Secondary/lifestyle slide only — same 2x, bottom-anchored zoom crop as
-   ProductCard's hover crossfade (.card-media-hover), for visual
-   consistency between the two places this same photo shows up. The wrap
-   is a plain overflow:hidden box (unlike .card-media-hover-wrap, no
-   absolute positioning or opacity/hover-triggered fade needed here — this
-   slide is always visible, just one of several stacked/carousel images)
-   that clips the scaled image back down to its own unscaled footprint. */
-.pdp-secondary-wrap {
-  display: block;
-  overflow: hidden;
-}
-
-#pdpSecondaryImage {
-  transform: scale(2);
-  transform-origin: 50% 100%;
-}
-
 /* Carousel dot indicators — only relevant/shown on mobile (see media query).
    Hidden on desktop, where the gallery is a vertical stacked scroll, not a
    swipeable carousel. */
@@ -1551,23 +1534,6 @@ a { color: inherit; text-decoration: none; }
     aspect-ratio: 4 / 5;
     object-fit: cover;
     scroll-snap-align: start;
-  }
-
-  /* .pdp-secondary-wrap, not #pdpSecondaryImage itself, is the direct
-     .pdp-gallery child now — flex/scroll-snap-align only take effect on an
-     actual flex item, so the wrap needs its own copy of the slide sizing
-     the rule above already gives the other two (plain) <img> slides. */
-  .pdp-secondary-wrap {
-    flex: 0 0 100%;
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    scroll-snap-align: start;
-  }
-
-  #pdpSecondaryImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
 
   /* Overlaid on the image frame instead of stacked below it — a sibling of

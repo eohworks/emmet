@@ -1,11 +1,10 @@
 // Shared product catalog — static data only, no backend of any kind.
 //
-// images.secondary holds an optional per-finish editorial/lifestyle shot
-// (filenames follow an e-<item number>-<finish>-secondary convention, e.g.
-// e-1 = Item One) shown as a second PDP gallery slide.
-// Left out entirely wherever that finish has no secondary shot yet — the PDP
-// falls back to just the one pack-shot image rather than showing a
-// mismatched or duplicate photo.
+// images.secondary holds a per-finish editorial/lifestyle shot (filenames
+// follow an e-<item number>-<finish>-secondary convention, e.g. e-1 = Item
+// One) shown as a second PDP gallery slide and as the ProductCard hover
+// crossfade. A finish with no entry here falls back to just the one
+// pack-shot image rather than showing a mismatched or duplicate photo.
 //
 // illustration is one full-width painterly character illustration per item
 // (finish-independent — the same piece of art regardless of gold/silver),
@@ -22,6 +21,7 @@ const PRODUCTS = {
       gold: "assets/item-one-gold.png",
       secondary: {
         gold: "assets/e-1-gold-secondary.jpg",
+        silver: "assets/e-1-silver-secondary.jpg",
       },
     },
     illustration: "assets/item-one-illustration.jpg",
@@ -52,6 +52,7 @@ const PRODUCTS = {
       silver: "assets/item-three-silver.png",
       gold: "assets/item-three-gold.png",
       secondary: {
+        gold: "assets/e-3-gold-secondary.jpg",
         silver: "assets/e-3-silver-secondary.jpg",
       },
     },
@@ -67,6 +68,7 @@ const PRODUCTS = {
       silver: "assets/item-four-silver.png",
       gold: "assets/item-four-gold.png",
       secondary: {
+        gold: "assets/e-4-gold-secondary.jpg",
         silver: "assets/e-4-silver-secondary.jpg",
       },
     },
@@ -82,6 +84,7 @@ const PRODUCTS = {
       silver: "assets/item-five-silver.png",
       gold: "assets/item-five-gold.png",
       secondary: {
+        gold: "assets/e-5-gold-secondary.jpg",
         silver: "assets/e-5-silver-secondary.jpg",
       },
     },

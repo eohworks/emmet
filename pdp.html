@@ -31,7 +31,7 @@
     <div class="pdp-gallery-frame">
       <div class="pdp-gallery" id="pdpGallery">
         <img id="pdpMainImage" src="" alt="">
-        <span class="pdp-secondary-wrap" id="pdpSecondaryWrap"><img id="pdpSecondaryImage" src="" alt=""></span>
+        <img id="pdpSecondaryImage" src="" alt="">
         <img id="pdpIllustration" src="" alt="">
       </div>
       <div class="pdp-gallery-dots" id="pdpGalleryDots"></div>
@@ -129,7 +129,6 @@
   const skuEl = document.getElementById("pdpSku");
   const colorPicker = document.getElementById("colorPicker");
   const mainImage = document.getElementById("pdpMainImage");
-  const secondaryWrap = document.getElementById("pdpSecondaryWrap");
   const secondaryImage = document.getElementById("pdpSecondaryImage");
   const pdpGallery = document.getElementById("pdpGallery");
   const illustrationImage = document.getElementById("pdpIllustration");
@@ -155,7 +154,7 @@
     // when this finish doesn't have one, that slide (and its dot) is
     // dropped rather than shown blank.
     const secondarySrc = product.images.secondary && product.images.secondary[finish];
-    secondaryWrap.style.display = secondarySrc ? "" : "none";
+    secondaryImage.style.display = secondarySrc ? "" : "none";
     if (secondarySrc) {
       secondaryImage.src = secondarySrc;
       secondaryImage.alt = `${product.name}, ${finish} finish, lifestyle photo`;
