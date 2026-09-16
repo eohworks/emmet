@@ -16,15 +16,19 @@
 
 <header class="site-header">
   <a href="plp.html" class="nav-link">Shop</a>
-  <!-- --nav-logo-fill overridden locally to a mid-gray — see index.html's
-       comment: the neutral theme's --color-accent-logo is pure black, and the
-       chrome shimmer's mix-blend-mode:overlay needs a lighter base to show. -->
-  <a href="index.html" class="site-logo" aria-label="Emmett home" style="--nav-logo-fill:#9a9a9a;">
-    <span class="site-logo-svg" id="siteLogo"></span>
-    <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
-  </a>
   <a href="#" class="nav-link" id="cartLink">Cart</a>
 </header>
+<!-- Sibling of .site-header, not nested inside it — the neutral theme's
+     mix-blend-mode:difference on .site-header would otherwise flatten the
+     logo into that blend along with SHOP/CART. See .site-logo's own
+     comment in styles.css. --nav-logo-fill overridden locally to navy-600
+     — see index.html's comment: the neutral theme's --color-accent-logo is
+     pure black, and the chrome shimmer's mix-blend-mode:overlay needs a
+     lighter base to show. -->
+<a href="index.html" class="site-logo" aria-label="Emmett home" style="--nav-logo-fill:var(--color-navy-600);">
+  <span class="site-logo-svg" id="siteLogo"></span>
+  <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
+</a>
 
 <main class="shop shop--plp">
   <div class="product-grid" id="productGrid"></div>

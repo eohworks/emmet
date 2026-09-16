@@ -75,11 +75,19 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
+/* position:fixed (not absolute) and a sibling of .site-header in the
+   markup, not a child of it — the neutral theme's mix-blend-mode:difference
+   on .site-header (see theme-neutral.css) forces the header into its own
+   stacking context and blends that WHOLE context (header + any descendant)
+   against the page as one flattened unit, so a child couldn't opt back out
+   with its own mix-blend-mode:normal. Living outside that context is the
+   only way for the logo to keep rendering its plain, unblended fill. */
 .site-logo {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  top: 50%;
+  top: calc(var(--header-height) / 2); /* vertical center of .site-header — no longer a positioning ancestor now that this is a sibling, so it has to be recomputed against the viewport instead of an implicit 50% of the header's own box */
   transform: translate(-50%, -50%);
+  z-index: 21;
   display: block;
   width: 190px;
 }
