@@ -37,6 +37,7 @@
         <img id="pdpMainImage" src="" alt="">
         <img id="pdpSecondaryImage" src="" alt="">
         <img id="pdpIllustration" src="" alt="">
+        <img id="pdpClosingImage" src="" alt="">
       </div>
       <div class="pdp-gallery-dots" id="pdpGalleryDots"></div>
     </div>
@@ -136,6 +137,7 @@
   const secondaryImage = document.getElementById("pdpSecondaryImage");
   const pdpGallery = document.getElementById("pdpGallery");
   const illustrationImage = document.getElementById("pdpIllustration");
+  const closingImage = document.getElementById("pdpClosingImage");
 
   // Finish-independent (same artwork for gold or silver), so it's set once
   // here rather than inside renderProduct() — and always last in the
@@ -143,6 +145,11 @@
   // one) the secondary lifestyle shot.
   illustrationImage.src = product.illustration;
   illustrationImage.alt = `${product.name}, illustration`;
+
+  // Shared closing shot, identical across every item/finish — always the
+  // very last slide, after the illustration.
+  closingImage.src = PDP_CLOSING_IMAGE;
+  closingImage.alt = "Emmett box still life";
   const galleryDotsWrap = document.getElementById("pdpGalleryDots");
 
   function renderProduct() {
@@ -165,10 +172,11 @@
     }
 
     // Dots are rebuilt from scratch each render (not just re-toggled) since
-    // the slide count itself changes with finish — 2 slides (main,
-    // illustration) or 3 (main, secondary, illustration). Index-matched
-    // 1:1 with the currently-visible <img> elements in pdpGallery.
-    const slideCount = secondarySrc ? 3 : 2;
+    // the slide count itself changes with finish — 3 slides (main,
+    // illustration, closing) or 4 (main, secondary, illustration, closing).
+    // Index-matched 1:1 with the currently-visible <img> elements in
+    // pdpGallery.
+    const slideCount = secondarySrc ? 4 : 3;
     galleryDotsWrap.innerHTML = Array.from({ length: slideCount })
       .map((_, i) => `<span class="${i === 0 ? "is-active" : ""}"></span>`)
       .join("");

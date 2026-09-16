@@ -122,6 +122,7 @@
           <img src="${card.image}" alt="${card.name}, ${card.finish} finish">
           ${secondarySrc ? `<span class="card-media-hover-wrap"><img class="card-media-hover" src="${secondarySrc}" alt="" aria-hidden="true"></span>` : ""}
         </div>
+        ${secondarySrc ? '<div class="card-media-dots" aria-hidden="true"><span class="is-active"></span><span></span></div>' : ""}
         ${card.lifestyle ? "" : '<span class="card-shimmer" aria-hidden="true"></span>'}
         <div class="card-row card-row--top">
           <p class="card-name">${card.name}</p>
@@ -189,6 +190,27 @@
     const isSpread = section.type === "spread";
     return section.cards.map((c) => cardHTML(c, isSpread)).join("");
   }).join("");
+
+  // Mobile swipe carousel: .card-media becomes a horizontal scroll-snap
+  // container (see styles.css's (max-width: 768px) rules), so the dots
+  // just need to track its scrollLeft — same treatment as plp.html's
+  // small cards, for consistency across every page. Only fires from a
+  // real swipe, never on desktop where .card-media has no scrollable
+  // overflow, and harmlessly no-ops on cards with no dots (large/lifestyle
+  // cards, which have no secondarySrc and so no .card-media-dots sibling).
+  document.querySelectorAll(".card-media").forEach((media) => {
+    const dotsWrap = media.nextElementSibling;
+    if (!dotsWrap || !dotsWrap.classList.contains("card-media-dots")) return;
+    const dots = dotsWrap.querySelectorAll("span");
+    media.addEventListener(
+      "scroll",
+      () => {
+        const index = Math.round(media.scrollLeft / media.clientWidth);
+        dots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
+      },
+      { passive: true }
+    );
+  });
 </script>
 </body>
 </html>

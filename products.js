@@ -96,3 +96,8 @@ const MATERIAL_LABEL = {
   silver: "sterling silver",
   gold: "18k gold vermeil",
 };
+
+// Shared across every item (not per-product, unlike images.secondary and
+// illustration above) — the same closing still life shown last in every
+// PDP gallery/carousel, regardless of item or finish.
+const PDP_CLOSING_IMAGE = "assets/box-still-life.jpg";
