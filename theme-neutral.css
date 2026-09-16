@@ -18,12 +18,13 @@
 
    Deliberately left unchanged:
    - --color-surface-card: already neutral (gray-100) in the default theme.
+   - --color-surface-page: stays the default white on index/PDP — only
+     overridden for PLP specifically, below.
    - --color-finish-gold / --color-finish-silver: these represent real
      product material (actual gold/silver jewelry), not brand/UI color —
      a neutral UI theme shouldn't repaint what the product is made of. */
 
 [data-theme="neutral"] {
-  --color-surface-page: var(--color-sky); /* was left as white — now a pale blue tint behind the page and cart drawer (both read this same token) */
   --color-text-primary: var(--color-black);
   --color-text-hover: var(--color-white); /* was --color-gray-600 — this only ever applies to ProductCard hover text, which sits over the lifestyle-photo crossfade at that exact moment; gray didn't read against the photo, white does */
   --color-accent-brand: var(--color-black);
@@ -71,8 +72,8 @@
   mix-blend-mode: difference;
 }
 
-/* Footer: the same pale-blue --color-sky background as the page, with
-   black link text for contrast against it, plus the brand symbol gets
+/* Footer: a pale-blue --color-sky background, with black link text for
+   contrast against it, plus the brand symbol gets
    the chrome shimmer (same treatment as the nav logo) instead of the
    default organic drift. --footer-mark-fill uses navy-600 (same as
    --nav-logo-fill above) rather than the accent pink/black this theme
@@ -86,4 +87,11 @@
 
 [data-theme="neutral"] .footer-mark {
   --footer-mark-fill: var(--color-navy-600);
+}
+
+/* PLP only: page background (and the cart drawer, which reads the same
+   token) gets the pale-blue --color-sky tint; index and PDP keep the
+   default white --color-surface-page from tokens.css. */
+[data-theme="neutral"] .plp-body {
+  --color-surface-page: var(--color-sky);
 }
