@@ -145,11 +145,6 @@
   // one) the secondary lifestyle shot.
   illustrationImage.src = product.illustration;
   illustrationImage.alt = `${product.name}, illustration`;
-
-  // Shared closing shot, identical across every item/finish — always the
-  // very last slide, after the illustration.
-  closingImage.src = PDP_CLOSING_IMAGE;
-  closingImage.alt = "Emmett box still life";
   const galleryDotsWrap = document.getElementById("pdpGalleryDots");
 
   function renderProduct() {
@@ -170,6 +165,11 @@
       secondaryImage.src = secondarySrc;
       secondaryImage.alt = `${product.name}, ${finish} finish, lifestyle photo`;
     }
+
+    // Per-finish box shot (see products.js) — always the very last slide,
+    // after the illustration.
+    closingImage.src = product.images.box[finish];
+    closingImage.alt = `${product.name}, ${finish} finish, in its box`;
 
     // Dots are rebuilt from scratch each render (not just re-toggled) since
     // the slide count itself changes with finish — 3 slides (main,

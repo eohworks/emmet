@@ -6,6 +6,9 @@
 // crossfade. A finish with no entry here falls back to just the one
 // pack-shot image rather than showing a mismatched or duplicate photo.
 //
+// images.box is the per-finish packaged-in-its-box shot, always the last
+// PDP gallery slide (e-<item number>-<finish>-box).
+//
 // illustration is one full-width painterly character illustration per item
 // (finish-independent — the same piece of art regardless of gold/silver),
 // shown at the bottom of that item's PDP.
@@ -23,6 +26,10 @@ const PRODUCTS = {
         gold: "assets/e-1-gold-secondary.jpg",
         silver: "assets/e-1-silver-secondary.jpg",
       },
+      box: {
+        gold: "assets/e-1-gold-box.jpg",
+        silver: "assets/e-1-silver-box.jpg",
+      },
     },
     illustration: "assets/item-one-illustration.jpg",
   },
@@ -38,6 +45,10 @@ const PRODUCTS = {
       secondary: {
         gold: "assets/e-2-gold-secondary.jpg",
         silver: "assets/e-2-silver-secondary.jpg",
+      },
+      box: {
+        gold: "assets/e-2-gold-box.jpg",
+        silver: "assets/e-2-silver-box.jpg",
       },
     },
     illustration: "assets/item-two-illustration.jpg",
@@ -55,6 +66,10 @@ const PRODUCTS = {
         gold: "assets/e-3-gold-secondary.jpg",
         silver: "assets/e-3-silver-secondary.jpg",
       },
+      box: {
+        gold: "assets/e-3-gold-box.jpg",
+        silver: "assets/e-3-silver-box.jpg",
+      },
     },
     illustration: "assets/item-three-illustration.jpg",
   },
@@ -70,6 +85,10 @@ const PRODUCTS = {
       secondary: {
         gold: "assets/e-4-gold-secondary.jpg",
         silver: "assets/e-4-silver-secondary.jpg",
+      },
+      box: {
+        gold: "assets/e-4-gold-box.jpg",
+        silver: "assets/e-4-silver-box.jpg",
       },
     },
     illustration: "assets/item-four-illustration.jpg",
@@ -87,6 +106,10 @@ const PRODUCTS = {
         gold: "assets/e-5-gold-secondary.jpg",
         silver: "assets/e-5-silver-secondary.jpg",
       },
+      box: {
+        gold: "assets/e-5-gold-box.jpg",
+        silver: "assets/e-5-silver-box.jpg",
+      },
     },
     illustration: "assets/item-five-illustration.jpg",
   },
@@ -97,7 +120,3 @@ const MATERIAL_LABEL = {
   gold: "18k gold vermeil",
 };
 
-// Shared across every item (not per-product, unlike images.secondary and
-// illustration above) — the same closing still life shown last in every
-// PDP gallery/carousel, regardless of item or finish.
-const PDP_CLOSING_IMAGE = "assets/box-still-life.jpg";
