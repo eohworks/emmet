@@ -1,7 +1,7 @@
 // Client-side only cart drawer. Nothing here talks to a server —
 // it just tracks a count in memory for the session so "Add To Cart" feels real.
 //
-// Row design ported from the Draft EmmetCartDrawer component (components.js):
+// Row design ported from the earlier draft cart-drawer component:
 // bigger square thumbnail, name+price on one row, finish+swatch dot, and a
 // real quantity stepper (adding the same item twice bumps its qty instead of
 // duplicating the row; "−" at qty 1 removes the line).
