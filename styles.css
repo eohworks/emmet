@@ -926,260 +926,6 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
 }
 
-/* ==========================================================================
-   PDP Branch — experimental variant (Figma node 37:10, "PDP branch"). One
-   continuous full-width image column (single page scroll, no split gallery/
-   details columns); the product info card floats on top of it as a sticky
-   "liquid glass" panel. That glass treatment is a deliberate departure from
-   the literal Figma frame (node 37:17 there just uses the plain opaque
-   card/bg fill) per explicit instruction — so the blur/opacity/radius/shadow
-   values below are new, bespoke to this variant, and intentionally NOT
-   ported into tokens.json, since there's no real Figma variable behind
-   "glass" to mirror. Everything inside the card (name, description, price,
-   button, color picker) reuses the exact same classes/tokens as the main
-   PDP — only the card's own container styling changes.
-   ========================================================================== */
-
-/* Positioning context for the sticky card overlay below — spans the hero
-   image AND the additional-images row combined, so the card keeps sticking
-   through both sections and only releases once the footer (its next
-   sibling, outside this wrapper) begins. */
-.pdp-branch-scroll {
-  position: relative;
-}
-
-/* 12-column underlying grid — the product (pack-shot) image is centered
-   in a 6-column span (columns 4–9) instead of running full-bleed; the
-   lifestyle image below it stays full-width (spans all 12). */
-.pdp-branch-gallery {
-  background: var(--color-surface-inverse); /* was --color-navy-900 direct — same bug .pdp-gallery had before its own fix */
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-}
-
-.pdp-branch-gallery img {
-  display: block;
-  width: 100%;
-  height: auto;
-  grid-column: 1 / -1;
-}
-
-#pdpBranchMainImage {
-  grid-column: 4 / 10; /* columns 4–9 inclusive: 6 of 12, centered */
-}
-
-/* Absolutely-positioned overlay sized via inset:0 against .pdp-branch-scroll
-   (hero image + additional-images row combined) — this is what gives the
-   sticky card below room to travel through both sections and only release
-   right at the footer, instead of sticking forever like position:fixed
-   would. Same 12-col grid as the gallery so the card can position itself
-   against the same column tracks. */
-.pdp-branch-card-wrap {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  align-items: end; /* anchors the card's resting position to the bottom of the (tall) wrap, matching its bottom-sticky behavior — grid's default stretch would otherwise make it fill the wrap's full (image-column-height) row axis instead of sizing to its own content */
-  padding: 0 var(--space-500); /* same page margin as .site-header/.cart-drawer, so the card's right edge doesn't sit flush against the viewport */
-  pointer-events: none; /* only the card itself should intercept clicks */
-}
-
-.pdp-branch-card {
-  grid-column: 9 / 13; /* columns 9–12 inclusive: 4 of 12, right-aligned */
-  position: sticky;
-  bottom: var(--space-500);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-inline-gap); /* semantic token for spacing between stacked items — not the raw --space-500 primitive, even though same value */
-  padding: var(--space-500);
-  pointer-events: auto;
-
-  /* Liquid glass — frosted, translucent panel over the scrolling imagery. */
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 24px;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  box-shadow:
-    0 8px 32px rgba(30, 23, 82, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-/* The card's own top-row/description/bottom-row all reuse .pdp-top-row,
-   .pdp-description, .pdp-bottom-row etc. as-is, but those shared classes
-   carry their own margins from the main (non-gap-based) PDP layout — here
-   the card relies on flex `gap` for spacing instead, so those margins are
-   zeroed to avoid stacking on top of it. (No SKU line in this variant —
-   dropped to save space in the now-narrower, centered card.) */
-.pdp-branch-card .pdp-top-row {
-  margin-bottom: 0;
-}
-
-/* Pulls description up closer to the name/color-picker row specifically —
-   the card's `gap` (--space-inline-gap, 24px) still governs the other
-   transition (description → price/button row) unchanged; this just trims
-   the one above it down to --space-150 (10px) via a token-driven offset,
-   rather than reducing the shared gap value itself. */
-.pdp-branch-card .pdp-description {
-  margin: calc(var(--space-150) - var(--space-inline-gap)) 0 0;
-}
-
-/* Additional product images — a plain 6/6 two-up row below the sticky
-   hero, matching Figma's "Additional product images" section (node
-   51:322): two images sharing the same 12-col grid, each spanning half. */
-.pdp-branch-more-images {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  background: var(--color-surface-inverse); /* was --color-navy-900 direct */
-}
-
-.pdp-branch-more-images img {
-  display: block;
-  grid-column: span 6;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-
-/* ==========================================================================
-   Home/PLP Branch — experimental variant (Figma node 50:67, "Home/PLP
-   branch"). A near-full-viewport (90vh) hero: the cast photo fills most of
-   the screen at 75% opacity, deliberately 10vh short of full height so the
-   footer peeks in below the fold as a scroll cue, with the rest of the
-   footer reachable by scrolling (unlike the fixed single-screen version
-   this started as). All 10 products sit on the hero as a
-   coverflow-style carousel instead of a scrolling grid. Cards have no
-   background/border here (they float directly on the photo) and only the
-   centered ("active") product shows its name/finish/price/button — the
-   others are bare pendant images. Clicking a side pendant re-centers it;
-   clicking the already-centered one navigates to its PDP branch page.
-   ========================================================================== */
-
-.plp-branch-hero {
-  position: relative;
-  height: 90vh; /* was 100vh — leaves 10% of the next section peeking in below the fold as a scroll cue */
-  overflow: hidden;
-  background: var(--color-black);
-}
-
-.plp-branch-hero-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.75;
-}
-
-.plp-branch-carousel {
-  position: absolute;
-  inset: 0;
-  --carousel-spacing: 340px; /* read by index-branch.html's JS so slide spacing stays in sync with the width below across breakpoints */
-  touch-action: pan-y; /* horizontal swipes are handled by our own JS below, not the browser's native gesture */
-}
-
-.plp-branch-slide {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 400px;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* pins .card-row--top/--bottom to opposite edges, same as .product-card does */
-  transform: translate(-50%, -50%) translateX(var(--slide-x, 0px)) scale(var(--slide-scale, 1));
-  z-index: var(--slide-z, 1);
-  opacity: 0.9; /* non-selected products recede slightly */
-  border-radius: 0; /* rounds to match the PDP branch card only in the hover state below — stays sharp otherwise */
-  transition: transform 0.4s ease, opacity 0.3s ease, border-radius 0.3s ease;
-}
-
-/* Hovering a dimmed product previews what clicking it would do — bring it
-   to full opacity — so the interaction reads clearly before you commit. */
-.plp-branch-slide:hover,
-.plp-branch-slide.is-active {
-  opacity: 1;
-}
-
-.plp-branch-slide .card-media {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-/* Liquid glass backdrop for the highlighted card, same recipe as the PDP
-   branch's sticky card — hidden by default, only fades up on desktop
-   hover (see the (hover: hover) rule below), never on mobile/touch where
-   there's no real hover state to trigger it. Sits behind .card-media (z:0)
-   because it comes first in the DOM at the same z-index — the pendant PNGs
-   are transparent-background cutouts, so the glass shows through around
-   the pendant and behind the name/finish/price/button text. */
-.plp-branch-slide-glass {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 24px; /* matches .pdp-branch-card's radius */
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: opacity 0.3s ease;
-}
-
-@media (hover: hover) and (min-width: 769px) {
-  /* Rounds the slide's own overflow:hidden clip too, so the pendant image
-     and text get clipped to the same rounded corners as the glass panel
-     underneath — not just the glass layer in isolation. */
-  .plp-branch-slide.is-active:hover {
-    border-radius: 24px;
-  }
-
-  .plp-branch-slide.is-active:hover .plp-branch-slide-glass {
-    opacity: 1;
-  }
-}
-
-/* No background/border (unlike .product-card) — the image sits straight
-   on the hero photo. Name/finish/price/button reuse the exact same
-   .card-row/.card-name/.card-finish/.card-price/.btn-bag classes as the
-   regular grid cards; text color and padding are adjusted (white text, no
-   card-bg tinting; 24px padding on every side to match .pdp-branch-card
-   rather than the regular card's tighter 12px, since this card is now
-   considerably bigger) and visibility is gated to .is-active. */
-.plp-branch-slide .card-row {
-  opacity: 0;
-  pointer-events: none;
-  padding-left: var(--space-500);
-  padding-right: var(--space-500);
-  transition: opacity 0.3s ease;
-}
-
-.plp-branch-slide .card-row--top {
-  height: auto;
-  padding-top: var(--space-500);
-}
-
-.plp-branch-slide .card-row--bottom {
-  height: auto;
-  padding-bottom: var(--space-500);
-}
-
-.plp-branch-slide.is-active .card-row {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.plp-branch-slide .card-name,
-.plp-branch-slide .card-finish,
-.plp-branch-slide .card-price {
-  color: var(--button-text-default);
-}
-
 /* ---------- Cart drawer (shared by Home and PDP) ---------- */
 
 .cart-overlay {
@@ -1197,14 +943,6 @@ a { color: inherit; text-decoration: none; }
   pointer-events: auto;
 }
 
-/* Branch pages: the glass drawer floats as its own card rather than a
-   flush edge-to-edge panel, so it doesn't need the rest of the page dimmed
-   behind it — pointer-events stays auto (clicking outside the drawer still
-   closes it via cart.js), only the visible darkening is dropped. */
-.cart-overlay--glass.is-open {
-  opacity: 0;
-}
-
 .cart-drawer {
   position: fixed;
   top: 0;
@@ -1219,34 +957,6 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   padding: var(--space-600) var(--space-500);
   padding-top: var(--space-200); /* matches .site-header's vertical padding, so CART aligns with the SHOP/CART nav links */
-}
-
-/* Liquid glass variant — branch pages only (pdp-branch.html, index-branch.html
-   opt in via this modifier class). Same frosted-panel recipe as the PDP
-   branch's sticky card and the PLP branch's hover reveal: translucent white,
-   blurred backdrop, soft highlight border. Inset from all four edges by the
-   page margin (same --space-500/--space-300 used elsewhere for the page's
-   desktop/mobile margins) instead of flush against the viewport, so it now
-   reads as a floating card like those other glass panels — border-radius
-   and an all-around border/shadow (rather than just the left edge) follow
-   from that. */
-.cart-drawer--glass {
-  top: var(--space-500);
-  right: var(--space-500);
-  bottom: var(--space-500);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 24px; /* matches .pdp-branch-card's radius */
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  box-shadow:
-    0 8px 32px rgba(30, 23, 82, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  /* translateX(100%) alone (the base rule) only clears a panel that sits
-     flush against the edge (right:0) — now that this variant has a
-     right-margin gap, closed still left that gap's width peeking on
-     screen, so travel that extra distance too. */
-  transform: translateX(calc(100% + var(--space-500)));
 }
 
 .cart-drawer.is-open {
@@ -1549,7 +1259,7 @@ a { color: inherit; text-decoration: none; }
      positioned .pdp-gallery-frame, so the dots stay put at the bottom of
      the frame as the user swipes instead of scrolling away with it. Same
      bottom margin (--space-300) as the page's other mobile margins
-     (.site-header, .pdp-branch-card-wrap). */
+     (.site-header). */
   .pdp-gallery-dots {
     display: flex;
     justify-content: center;
@@ -1566,59 +1276,6 @@ a { color: inherit; text-decoration: none; }
     height: auto;
     overflow: visible;
     padding: var(--space-500);
-  }
-
-  /* PDP Branch: same sticky-to-bottom glass overlay as desktop (still
-     absolute + grid + position:sticky from the base rules above) — only
-     the column span changes, going full-width with a little horizontal
-     breathing room instead of the desktop's 6-of-12 centered column. */
-  .pdp-branch-card-wrap {
-    padding: 0 var(--space-300);
-  }
-
-  .pdp-branch-card {
-    grid-column: 1 / -1;
-  }
-
-  /* The 6-of-12 centered column is a desktop refinement — on narrow
-     screens the product image goes back to full width like the lifestyle
-     image below it. */
-  #pdpBranchMainImage {
-    grid-column: 1 / -1;
-  }
-
-  .pdp-branch-more-images img {
-    grid-column: 1 / -1;
-  }
-
-  /* Cart drawer (branch pages, glass variant): spans the full 12-column
-     width instead of the desktop's fixed min(380px, 90vw) panel, inset by
-     the same mobile page margin (--space-300) used by .site-header and
-     .pdp-branch-card-wrap above — width:auto lets the left/right insets
-     size it instead of the inherited fixed width. */
-  .cart-drawer--glass {
-    top: var(--space-300);
-    right: var(--space-300);
-    bottom: var(--space-300);
-    left: var(--space-300);
-    width: auto;
-    transform: translateX(calc(100% + var(--space-300))); /* mobile's own margin gap — see the desktop rule's comment */
-  }
-
-  /* PLP Branch carousel: smaller slides on a phone-width screen. Spacing
-     between slides is NOT set here on mobile — index-branch.html's JS
-     computes it as half the viewport width instead, so each neighbor's
-     own center lands exactly on the screen edge and gets cropped right at
-     its midpoint (a stronger "carousel" feel than an arbitrary px gap). */
-  .plp-branch-slide {
-    width: 220px;
-  }
-
-  /* Highlighted (active) card enlarges to span columns 2–11 of the page's
-     12-col grid (10/12 of the carousel's width, 1 column of margin each
-     side) — noticeably bigger than the 220px neighbors around it. */
-  .plp-branch-slide.is-active {
-    width: 83.3333%;
   }
 
   .product-grid {
@@ -1698,7 +1355,7 @@ a { color: inherit; text-decoration: none; }
   /* Without this, .btn-bag--large silently collapses to the compact mobile
      sizing above — same specificity, but the plain .btn-bag rule comes
      later in the cascade, so it was winning and shrinking every "large"
-     button (PDP, PDP branch) back down to compact size on mobile. */
+     button (PDP) back down to compact size on mobile. */
   .btn-bag--large {
     padding: var(--button-padding-y-large) var(--button-padding-x-large);
     font-size: var(--button-font-size-large);

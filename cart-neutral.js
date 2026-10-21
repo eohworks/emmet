@@ -1,14 +1,10 @@
 // Client-side only cart drawer. Nothing here talks to a server —
 // it just tracks a count in memory for the session so "Add To Cart" feels real.
 //
-// Neutral theme only — a copy of cart.js (same file-per-variant pattern as
-// index.html/index-color.html) with the updated row design ported over
-// from the Draft EmmetCartDrawer component (components.js/components.html):
+// Row design ported from the Draft EmmetCartDrawer component (components.js):
 // bigger square thumbnail, name+price on one row, finish+swatch dot, and a
-// real quantity stepper (adding the same item twice now bumps its qty
-// instead of duplicating the row; "−" at qty 1 removes the line). Other
-// pages (index-color.html, pdp-color.html, Branch) keep loading the
-// original plain cart.js unchanged.
+// real quantity stepper (adding the same item twice bumps its qty instead of
+// duplicating the row; "−" at qty 1 removes the line).
 const Cart = (() => {
   let items = []; // each: {name, finish, price, image, qty}
 
