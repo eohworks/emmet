@@ -26,13 +26,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* PLP only: the pale-blue tint behind the page (and the cart drawer, which
+   reads the same token); index and PDP keep the default white. */
+.plp-body {
+  --color-surface-page: var(--color-surface-tint);
+}
+
 img { display: block; max-width: 100%; }
 
 a { color: inherit; text-decoration: none; }
 
 /* ---------- Header (overlaid on hero, transparent) ---------- */
 
+/* NavBar auto-contrast: mix-blend-mode:difference computes
+   difference(backdrop, source) per pixel, so the white nav text
+   (--nav-text-color) inverts against whatever the header overlays — black
+   backdrop -> white text, white backdrop -> black text, photo -> its own
+   negative. The source must be non-black for this to do anything
+   (difference against black is a no-op). */
 .site-header {
+  mix-blend-mode: difference;
   position: fixed;
   top: 0;
   left: 0;
@@ -57,7 +70,7 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-/* Cart item-count suffix — "CART(1)" — set by cart-neutral.js's render().
+/* Cart item-count suffix — "CART(1)" — set by cart.js's render().
    Desktop only, per explicit request; on mobile .nav-link already drops to
    --font-size-product (14px, the same value as --font-size-200 here), so
    the count naturally inherits that instead of needing its own rule. */
@@ -76,8 +89,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* position:fixed (not absolute) and a sibling of .site-header in the
-   markup, not a child of it — the neutral theme's mix-blend-mode:difference
-   on .site-header (see theme-neutral.css) forces the header into its own
+   markup, not a child of it — the mix-blend-mode:difference on
+   .site-header forces the header into its own
    stacking context and blends that WHOLE context (header + any descendant)
    against the page as one flattened unit, so a child couldn't opt back out
    with its own mix-blend-mode:normal. Living outside that context is the
@@ -215,7 +228,7 @@ a { color: inherit; text-decoration: none; }
 /* .card-name/.card-finish/.card-price each set their own color directly
    (see that shared rule above), so overriding it has to target them by
    name too — a color set on the .card-row parent alone would never reach
-   them. White in the neutral theme — legible against the photo, same
+   them. White — legible against the photo, same
    token regular ProductCards use for their own hover-over-photo text. */
 .product-card--lifestyle .card-name,
 .product-card--lifestyle .card-finish,
@@ -584,16 +597,16 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
-/* ---------- Liquid metal — chrome variant (draft) ----------
-   Draft alternative to the organic drift above — components.html only for
-   now, not wired into any real page. Reads as polished metal rather than
-   liquid: a neutral gray base (the class alone can't turn the pink logo
-   fill metallic, so the demo wrapper overrides --nav-logo-fill inline —
-   see components.html) plus a hard-edged banded gradient sweeping in one
-   direction on a loop, like a specular highlight sliding across a metal
-   surface, instead of soft blobs wandering. Same mask/overlay scaffolding
-   (.liquid-metal, .liquid-metal--logo) as the original — only
-   .liquid-metal-spin's own background/animation is swapped out. */
+/* ---------- Liquid metal — chrome variant ----------
+   The variant every page uses for the logo and footer symbol. Reads as
+   polished metal rather than liquid: a hard-edged banded gradient sweeping
+   in one direction on a loop, like a specular highlight sliding across a
+   metal surface, instead of soft blobs wandering. It's a mix-blend-mode
+   overlay on the mark's base fill (--nav-logo-fill / --footer-mark-fill),
+   so that base needs to be a mid-tone — overlay on pure black stays black.
+   Same mask/overlay scaffolding (.liquid-metal, .liquid-metal--logo) as the
+   default drift — only .liquid-metal-spin's own background/animation is
+   swapped out. */
 .liquid-metal--chrome .liquid-metal-spin {
   background: repeating-linear-gradient(
     115deg,
@@ -616,45 +629,6 @@ a { color: inherit; text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .liquid-metal--chrome .liquid-metal-spin {
-    animation: none;
-  }
-}
-
-/* ---------- Liquid metal — liquid variant (draft) ----------
-   Draft alternative to both the organic drift and chrome above —
-   components.html only for now. The other two never actually merge their
-   highlights: drift's blobs stay independent, chrome is a rigid banded
-   sweep. This one leans on the classic "gooey blob" trick — a heavy blur
-   immediately followed by a steep contrast boost — which pinches soft
-   blurred circles into a single blob as they drift close, then splits
-   them cleanly apart again, reading as droplets of mercury merging and
-   separating rather than light wandering over a fixed surface. Same
-   neutral-gray-fill reasoning as chrome (see components.html) so the
-   result reads as liquid metal, not a pink-tinted blend. Same mask/
-   overlay scaffolding as both — only .liquid-metal-spin's own background/
-   animation/filter changes. */
-.liquid-metal--liquid .liquid-metal-spin {
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 1) 0%, transparent 55%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 55%),
-    radial-gradient(circle, rgba(0, 0, 0, 0.5) 0%, transparent 55%);
-  background-size: 60% 60%;
-  background-repeat: no-repeat;
-  filter: blur(5px) contrast(18);
-  animation: liquid-merge 7s ease-in-out infinite;
-}
-
-@keyframes liquid-merge {
-  0%   { background-position: 10% 30%, 75% 65%, 45% 85%; }
-  20%  { background-position: 55% 20%, 35% 55%, 80% 40%; }
-  40%  { background-position: 75% 60%, 55% 15%, 15% 55%; }
-  60%  { background-position: 30% 75%, 70% 35%, 55% 10%; }
-  80%  { background-position: 15% 45%, 45% 80%, 75% 65%; }
-  100% { background-position: 10% 30%, 75% 65%, 45% 85%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .liquid-metal--liquid .liquid-metal-spin {
     animation: none;
   }
 }
@@ -697,7 +671,7 @@ a { color: inherit; text-decoration: none; }
 
 .pdp-gallery {
   width: 100%;
-  background: var(--color-surface-inverse); /* was the raw --color-navy-900 primitive — same value in every existing theme, but bypassed the neutral theme's override since that only touches the semantic tier */
+  background: var(--card-bg);
 }
 
 .pdp-gallery img {
@@ -1048,15 +1022,14 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.6;
 }
 
-/* Detailed row layout — Draft cart drawer (EmmetCartDrawer) only. The
-   live cart.js-driven drawer on Regular pages keeps the plain .cart-item
-   markup/styling above (single .cart-item-meta line, no qty row), so this
-   is scoped under .cart-item--detailed rather than changing those shared
-   rules directly. */
+/* Detailed row layout used by the cart drawer (cart.js): bigger square
+   thumbnail, name+price on one row, finish+swatch, quantity stepper. Scoped
+   under .cart-item--detailed so it layers over the base .cart-item rules
+   above instead of changing them. */
 .cart-item--detailed img {
   width: 104px;
   height: 104px;
-  border-radius: 0; /* overrides the shared .cart-item img radius — live cart.js thumbnails keep it, these don't */
+  border-radius: 0; /* overrides the shared .cart-item img radius */
 }
 
 .cart-item-top-row {

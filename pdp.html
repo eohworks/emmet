@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="neutral">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="theme-neutral.css">
 <script src="nav-scroll.js" defer></script>
 </head>
 <body class="pdp-body">
@@ -19,14 +18,11 @@
     <a href="plp.html" class="nav-link">Shop</a>
     <a href="#" class="nav-link" id="cartLink">Cart</a>
   </header>
-  <!-- Sibling of .site-header, not nested inside it — the neutral theme's
+  <!-- Sibling of .site-header, not nested inside it — the
        mix-blend-mode:difference on .site-header would otherwise flatten the
        logo into that blend along with SHOP/CART. See .site-logo's own
-       comment in styles.css. --nav-logo-fill overridden locally to
-       navy-600 — see index.html's comment: the neutral theme's
-       --color-accent-logo is pure black, and the chrome shimmer's
-       mix-blend-mode:overlay needs a lighter base to show. -->
-  <a href="index.html" class="site-logo" aria-label="Emmett home" style="--nav-logo-fill:var(--color-navy-600);">
+       comment in styles.css. -->
+  <a href="index.html" class="site-logo" aria-label="Emmett home">
     <span class="site-logo-svg" id="siteLogo"></span>
     <span class="liquid-metal liquid-metal--logo liquid-metal--chrome" aria-hidden="true"><span class="liquid-metal-spin"></span></span>
   </a>
@@ -112,7 +108,7 @@
 </aside>
 
 <script src="products.js"></script>
-<script src="cart-neutral.js"></script>
+<script src="cart.js"></script>
 <script src="components.js"></script>
 <script>
   fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {

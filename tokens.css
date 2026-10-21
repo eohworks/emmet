@@ -61,17 +61,19 @@
   --border-width-thin: 1px;
 
   /* ---- semantic ---- */
-  --color-text-primary: var(--color-navy-900);
+  --color-text-primary: var(--color-black);
   --color-text-on-accent: var(--color-white);
-  --color-text-hover: var(--color-pink-600);
-  --color-accent-brand: var(--color-pink-500);
-  --color-accent-logo: var(--color-pink-600);
+  --color-text-hover: var(--color-white);
+  --color-accent-brand: var(--color-black);
+  --color-accent-logo: var(--color-navy-600);
   --color-surface-page: var(--color-white);
   --color-surface-card: var(--color-gray-100);
-  --color-surface-inverse: var(--color-navy-900);
-  --color-border-subtle: var(--color-navy-900-a50);
+  --color-surface-inverse: var(--color-black);
+  --color-surface-inverse-hover: var(--color-gray-900);
+  --color-surface-tint: var(--color-sky);
+  --color-border-subtle: var(--color-gray-400);
   --color-border-divider: var(--color-gray-200);
-  --color-indicator-inactive: var(--color-navy-200);
+  --color-indicator-inactive: var(--color-gray-300);
   --color-finish-gold: var(--color-material-gold);
   --color-finish-silver: var(--color-material-silver);
   --font-family-heading: var(--font-family-display);
@@ -82,6 +84,7 @@
   --font-tracking-nav: var(--font-tracking-500);
   --font-tracking-product: var(--font-tracking-200);
   --font-tracking-footer-link: var(--font-tracking-100);
+  --radius-square: var(--radius-none);
   --radius-full: var(--radius-pill);
   --radius-default: var(--radius-md);
   --space-card-padding: var(--space-200);
@@ -90,10 +93,10 @@
 
   /* ---- component ---- */
   --button-bg-default: var(--color-surface-inverse);
-  --button-bg-hover: var(--color-accent-brand);
-  --button-bg-added: var(--color-accent-brand);
+  --button-bg-hover: var(--color-surface-inverse-hover);
+  --button-bg-added: var(--color-surface-inverse-hover);
   --button-text-default: var(--color-text-on-accent);
-  --button-radius: var(--radius-full);
+  --button-radius: var(--radius-square);
   --button-padding-x: var(--space-card-padding);
   --button-padding-y: var(--space-050);
   --button-padding-x-large: var(--space-500);
@@ -108,12 +111,12 @@
   --card-text-color: var(--color-text-primary);
   --card-text-color-hover: var(--color-text-hover);
   --card-padding-x: var(--space-card-padding);
-  --nav-text-color: var(--color-accent-brand);
+  --nav-text-color: var(--color-text-on-accent);
   --nav-font-family: var(--font-family-heading);
   --nav-font-size: var(--font-size-nav);
   --nav-tracking: var(--font-tracking-nav);
   --nav-logo-fill: var(--color-accent-logo);
-  --footer-bg: var(--color-surface-inverse);
+  --footer-bg: var(--color-surface-tint);
   --footer-link-color: var(--color-accent-brand);
   --footer-link-font-size: var(--font-size-footer-link);
   --footer-gap: var(--space-inline-gap);
