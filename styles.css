@@ -508,8 +508,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .liquid-metal--logo {
-  -webkit-mask-image: url("assets/svg/logo-mask.svg");
-  mask-image: url("assets/svg/logo-mask.svg");
+  -webkit-mask-image: url("assets/svg/logo-sans-mask.svg");
+  mask-image: url("assets/svg/logo-sans-mask.svg");
 }
 
 .liquid-metal--symbol {

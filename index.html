@@ -135,7 +135,7 @@
   // Inline the real brand SVGs so their internal fill (a CSS var referencing the
   // design tokens) resolves against this document's :root — an <img src="*.svg">
   // would render as an opaque image and couldn't see our custom properties.
-  fetch("assets/svg/logo.svg").then((r) => r.text()).then((svg) => {
+  fetch("assets/svg/logo-sans.svg").then((r) => r.text()).then((svg) => {
     document.getElementById("siteLogo").innerHTML = svg;
   });
   fetch("assets/svg/symbol.svg").then((r) => r.text()).then((svg) => {
